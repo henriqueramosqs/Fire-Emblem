@@ -39,6 +39,7 @@
 	li a0,1
 StartLevel:	#recebe em a0 o número da fase, efetua os proicedimentos necessários
 	#<procedimento_de_rodar_história>
+	
 	jal getLevelMap
 	lw a1, frame_zero
 	jal printMap
@@ -84,9 +85,9 @@ printMap:		# :void, recebe em a0  o endereco do arquivo do mapa e em a1 o endere
 	
 	mv s1,a0	# s1 = endereco inicial do arquivo de mapa
 
-	#addi s1,s1,260		# para debugging
+	# para debugging
 
-	li s2, 280	# s2 = quantidade de bytes por arquivos de mapa
+	li s2, 300	# s2 = quantidade de bytes por arquivos de mapa
 	add s2,s2,a0 	# s2 =  endereco final do arquivo de mapa
 	li s3, 0	# s3 = contador utilizado para posições
 	li s4,320	# s4 = numero utilizado em contas 
