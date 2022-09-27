@@ -16,6 +16,13 @@
 	.include "images_data/Hero.data"
 	.include "images_data/Enemy.data"
 	
+	
+	#Cores
+	menu_blue: .byte 155 
+	menu_white: .byte 255
+	menu_yellow: .byte 191
+	menu_grey: .byte 164
+	
 	frame_zero: .word 0xFF000000
 	frame_one:  .word 0xFF100000
 
@@ -49,10 +56,17 @@
 
 .text
 
-	li a0,,1
+	li a0,1
+	
+	li s9,12		#degugging
+	jal runOptionsMenu	#debugging
 	
 StartLevel:	#recebe em a0 o número da fase, efetua os proicedimentos necessários
 	#<procedimento_de_rodar_história>
+	
+	mv s11, a0 	# s11 armazena qual a fase
+	li s9,10 	# s9 e s10 serao usados para marcar a posicao do cursos (coord_x e coord_y respectivamente)
+	li s10,7
 	
 	jal getLevelMap
 	
@@ -62,6 +76,8 @@ StartLevel:	#recebe em a0 o número da fase, efetua os proicedimentos necessári
 	li a0,1
 	jal getAllies
 	
+	mv s8,a0	# s8 armazena endereco dos aliados  (sera bastante usado)
+	
 	la a1,Hero
 	lw a2,frame_zero	# printa aliados
 	jal printCharacters
@@ -69,11 +85,107 @@ StartLevel:	#recebe em a0 o número da fase, efetua os proicedimentos necessári
 	li a0,1
 	jal getEnemies
 	
+	mv s8,a0	# s8 armazena endereco dos inimigos  (sera bastante usado)
+	
 	la a1,Enemy	
 	lw a2,frame_zero	# printa inimigos
 	jal printCharacters
 
 GameLoop:
+
+	jal runOptionsMenu	#a abre o menu de opcoes
+	
+
+runOptionsMenu:
+	li t0,1
+	li t1, 0xFF200604 
+	sb t0,0(t1)	# troca de frame
+	
+	lw a5,frame_one	# prepara para chamada de procedimento de drawSquare
+	
+	li t2,10
+	bge s9,t2,drawLeftSideMenu
+	
+drawRightSideMenu:	
+	lb a0,menu_white
+	li a1,20
+	li a2,20
+	li a3,30
+	li a4,1
+	
+	addi sp,sp,-4
+	sw ra,0(sp)
+		
+	jal drawSquare	#desenha borda superior
+	
+	li a2,105
+	
+	jal drawSquare	#desenha borda inferior
+	
+	li a2,20
+	li a3,1
+	li a4,85
+	
+		
+	jal drawSquare	#desenha borda lateral esquerda
+	
+	lw ra,(sp)
+	addi sp,sp,4
+	
+	li a1,50
+
+	jal drawSquare	#desenha borda lateral direita
+	
+	lb a0, menu_blue
+	li a1,21
+	li a2,21
+	li a3,29
+	li a4,84
+	
+	jal drawSquare	# desenha fundo do menu
+
+	lw ra,0(sp)
+	addi sp,sp,4
+	ret
+	
+	
+drawLeftSideMenu:	
+	lb a0,menu_white
+	li a1,270
+	li a2,20
+	li a3,30
+	li a4,1
+	
+	addi sp,sp,-4
+	sw ra,0(sp)
+		
+	jal drawSquare	#desenha borda superior
+	
+	li a2,105
+	
+	jal drawSquare	#desenha borda inferior
+	
+	li a2,20
+	li a3,1
+	li a4,85
+	
+	jal drawSquare	#desenha borda lateral esquerda
+	
+	li a1,300
+
+	jal drawSquare	#desenha borda lateral direita
+	
+	lb a0, menu_blue
+	li a1,271
+	li a2,21
+	li a3,29
+	li a4,84
+	
+	jal drawSquare	# desenha fundo do menu
+
+	lw ra,0(sp)
+	addi sp,sp,4
+	ret
 
 	
 printCharacters:	# recebe em a0 o arquivo de allies/enemies, em a1 endereço do sprite, em a2 o endereco da frame
@@ -355,24 +467,35 @@ transparent:
 finishDraw:
 	ret
 	
-
-Blackout:			# :void, receve em a0 = endereco da frame, pinta a frame de preto
-	li t1,19200
-	mv t2,a0		#endereço base da frame
-	li t3,0
+drawSquare:		# : void, recebe codigo da cor em a0, coord_x em a1, coord_y  em a2, largura em a3, altura em a4, frame em a5
+	li t0,0  	# iterador para altura
+drawSquareOutterLoop:	
+	beq t0,a4,endDrawSquare
+	li t1,0		# iterador para largura
+drawSquareInnerLoop:
+	beq t1,a3,endInnerLoop 
 	
-BlackoutLoop:
-	beq t0,t1,BlackoutEnd  #se escever a quantidade de words suficientes, finaliza o loopp
-	slli t4,t0,2		#t4 = 4* indice_da_word
-	add t4,t4,t2		#t4 = endereço_base_da_frame + 4* indice_da_word
-	sw t3, (t4)		
+	add t2,t1,a1  	# t2 = pos_x do ponto
+	add t3,t0,a2	# t3 = pos_y do ponto
+	
+	add t2,t2,a5
+	
+	li t4,320
+	mul t3, t4,t3	
+	
+	add t3,t3,t2	# t3 = endereco na memoria
+	
+	sb a0,(t3)
+	
+	addi t1,t1,1
+	j drawSquareInnerLoop
+endInnerLoop:
 	addi t0,t0,1
-	j BlackoutLoop
-	
-BlackoutEnd:
+	j drawSquareOutterLoop
+endDrawSquare:
 	ret
 	
-
+		
 printString:	
 		addi	sp, sp, -8			# aloca espaco
     		sw	ra, 0(sp)			# salva ra
