@@ -1,7 +1,20 @@
 .data
+	#tiles
 	.include "images_data/Bush.data"
 	.include "images_data/Grass.data"
+	
+	#mapas
 	.include "maps/Mapa_fase1.data"
+	
+	#allies
+	.include "allies/allies_fase1.data"
+	
+	#enemies
+	.include "enemies/enemies_fase1.data"
+	
+	#sprites
+	.include "images_data/Hero.data"
+	.include "images_data/Enemy.data"
 	
 	frame_zero: .word 0xFF000000
 	frame_one:  .word 0xFF100000
@@ -36,14 +49,135 @@
 
 .text
 
-	li a0,1
+	li a0,,1
+	
 StartLevel:	#recebe em a0 o número da fase, efetua os proicedimentos necessários
 	#<procedimento_de_rodar_história>
 	
 	jal getLevelMap
+	
 	lw a1, frame_zero
-	jal printMap
-		
+	jal printMap		
+
+	li a0,1
+	jal getAllies
+	
+	la a1,Hero
+	lw a2,frame_zero	# printa aliados
+	jal printCharacters
+	
+	li a0,1
+	jal getEnemies
+	
+	la a1,Enemy	
+	lw a2,frame_zero	# printa inimigos
+	jal printCharacters
+
+GameLoop:
+
+	
+printCharacters:	# recebe em a0 o arquivo de allies/enemies, em a1 endereço do sprite, em a2 o endereco da frame
+	addi sp,sp,-12			#sobrescreve s0,s1,s2 (colocar na pilha)
+	sw s0,0(sp)	
+	sw s1,4(sp)
+	sw s2,8(sp)
+				
+	mv s0,a0  	# s0 contém enreco base do arquivo de character
+	mv a3,a2 	#preparam para chamada da funcao DrawImage
+	mv a0,a1
+
+
+	li s1,0 	# s1 = contador
+	lb s2,(s0)	# s2 = quantidade de characters
+	addi s0,s0,1
+	
+printCharactersLoop:
+	beq s1,s2 endPrintCharacters	#se printou todos os caracteres -> finaliza procedimento
+	slli t0,s1,2 	
+	add t0,t0,s0 	#t0 aponta para a linha de descricao do s1-esimo character
+	
+	lb a1,(t0)
+	slli a1,a1,4	#a1 = pos_x em pixels do personagem
+	
+	lb a2,1(t0)
+	slli a2,a2,4	#a2 = pos_y em pixels do personafem
+	
+	addi sp,sp,-8	#prepara a pilha para armazenar o endereco de retorno
+	sw ra,0(sp)
+	sw a0,4(sp)
+	
+	jal drawImage
+	
+	lw ra,0(sp)	#recupera o endereco de retorno
+	lw a0,4(sp)
+	addi sp,sp,8	
+	
+	addi s1,s1,1
+	j printCharactersLoop
+endPrintCharacters:
+	ret
+
+ 
+	
+getAllies:	#recebe em a0 o numero da fase, retorna o endereco do arquivo de allies correspondente ou -1 caso nao encontrado li t0,1
+	 li t0,1
+	 beq a0, t0,alliesLevel1  #checa se a0=1
+	 addi t0,t0,1
+	 beq a0,t0,alliesLevel2 #checa se a0=2
+	 addi t0,t0,1
+	 beq a0,t0,alliesLevel3 #checa se a0=3
+	 addi t0,t0,1
+	 beq a0,t0,alliesLevel4 #checa se a0=4
+	 addi t0,t0,1
+	 beq a0,t0,alliesLevel5 #checa se a0=5
+	 li a0,-1
+	 ret
+	 
+alliesLevel1:
+	la a0,allies_fase1
+	ret
+alliesLevel2:
+	#la a0,allies_fase2
+	ret
+alliesLevel3:	
+	#la a0,allies_fase3
+	ret
+alliesLevel4:
+	#la a0,allies_fase4
+	ret
+alliesLevel5:
+	#la a0,allies_fase5
+	ret
+	
+getEnemies:	#recebe em a0 o numero da fase, retorna o endereco do arquivo de enemies correspondente ou -1 caso nao encontrado li t0,1
+	 li t0,1
+	 beq a0, t0,enemiesLevel1  #checa se a0=1
+	 addi t0,t0,1
+	 beq a0,t0,enemiesLevel2 #checa se a0=2
+	 addi t0,t0,1
+	 beq a0,t0,enemiesLevel3 #checa se a0=3
+	 addi t0,t0,1
+	 beq a0,t0,enemiesLevel4 #checa se a0=4
+	 addi t0,t0,1
+	 beq a0,t0,enemiesLevel5 #checa se a0=5
+	 li a0,-1
+	 ret
+	 
+enemiesLevel1:
+	la a0,enemies_fase1
+	ret
+enemiesLevel2:
+	#la a0,enemies_fase2
+	ret
+enemiesLevel3:	
+	#la a0,enemies_fase3
+	ret
+enemiesLevel4:
+	#la a0,enemies_fase4
+	ret
+enemiesLevel5:
+	#la a0,enemies_fase5
+	ret
 		
 getLevelMap: # recebe em a0 numero da fase, retorna em a0 o endereco do mapa ou -1 se mapa da fase nao foi encontrado
 	 li t0,1
@@ -85,8 +219,6 @@ printMap:		# :void, recebe em a0  o endereco do arquivo do mapa e em a1 o endere
 	
 	mv s1,a0	# s1 = endereco inicial do arquivo de mapa
 
-	# para debugging
-
 	li s2, 300	# s2 = quantidade de bytes por arquivos de mapa
 	add s2,s2,a0 	# s2 =  endereco final do arquivo de mapa
 	li s3, 0	# s3 = contador utilizado para posições
@@ -97,13 +229,28 @@ printMapLoop:
 	beq s1,s2,printMapEnd 	# checa condicao de parada
 	mv a0,s1	
 	lb a0,0(a0)
+	
+	addi sp,sp,-4
+	sw ra,0(sp)
+	
 	jal getTile 		# armazena endereco do tile em a0
+	
+	lw ra,0(sp)
+	addi sp,sp,4
+	
 	
 	rem a1,s3,s4		# a1 = coord_x
 	div a2,s3,s4		
 	slli a2,a2,4		# a2 = coord_y
 	
-	jal drawImage		# pinta Tile
+	addi sp,sp,-4
+	sw ra,0(sp)
+	
+	jal drawImage 		#pinta character
+	
+	lw ra,0(sp)
+	addi sp,sp,4
+	
 	
 	addi s1,s1,1
 	addi s3,s3,16
@@ -114,6 +261,7 @@ printMapEnd:
 	
 
 getTile: #recebe em a0 o código do tile, retorna em a0 o endereço do tile ou -1 se nao encontrado
+	
 	li t0,1
 	beq a0,t0,grassTile
 	addi t0,t0,1
@@ -344,4 +492,4 @@ printChar.endForChar2J:	addi	t0, t0, -1 		# i--
 
 printChar.endForChar2I:	ret	
 	
-	
+
