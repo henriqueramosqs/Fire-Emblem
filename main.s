@@ -62,9 +62,7 @@
 
 .text
 
-	li a0,1
-	
-	li s9,1 	#degugging
+	li s9,11 	#degugging
 	jal runOptionsMenu	#debugging
 	
 StartLevel:	#recebe em a0 o número da fase, efetua os proicedimentos necessários
@@ -134,10 +132,6 @@ leftSideMenu:
 	
 		
 	jal drawSquare	#desenha borda lateral esquerda
-	
-	lw ra,(sp)
-	addi sp,sp,4
-	
 	li a1,102
 
 	jal drawSquare	#desenha borda lateral direita
@@ -193,7 +187,6 @@ rightSideMenu:
 	
 	jal drawSquare	# desenha fundo do menu
 
-
 	jal drawRightSideMenuOptions
 	
 	lw ra,0(sp)
@@ -245,11 +238,12 @@ endPrintCharacters:
 	
 drawLeftSideMenuOptions:	# :void,recebe em a0 indice da escolha
 	
-	addi sp,sp,-8
+	addi sp,sp,-12
 	sw a0,0(sp)		# coloca registradores na pilha
 	sw ra,4(sp)
+	sw s1,8(sp)
 	
-	mv t1, a0 		# t1 esta com o indice da escolha
+	mv s1, a0 		# t1 esta com o indice da escolha
 	
 	li t0,0
 
@@ -258,7 +252,7 @@ drawLeftSideMenuOptions:	# :void,recebe em a0 indice da escolha
 	li a2,22		# adiciona as informacoes de de print do primeiro item da lista(excessao da cor)
 	li a4,1	
 	
-	bne t1,t0,FirstLeftOptionOpaque
+	bne s1,t0,FirstLeftOptionOpaque
 	li a3,39935	#cor caso a primeira opcao  esteja selecionada
 	j paintFirstLeftMenuOption
 	
@@ -267,22 +261,22 @@ FirstLeftOptionOpaque:
 	
 paintFirstLeftMenuOption:
 	jal printString		#printa primeiro item da lista
-	addi t0,t0,1
+	li t0,1
 	la a0,arma	
 	li a1,22
 	addi a2,a2,20		# adiciona as informacoes de de print do segundo item da lista(excessao da cor)
-	bne t1,t0,secondLeftOptionOpaque
+	bne s1,t0,secondLeftOptionOpaque
 	li a3,39935	#cor caso a segunda opcao  esteja selecionada
 	j paintSecondLeftMenuOption
 secondLeftOptionOpaque:
 	li a3,39844		#cor caso a segunda opcao nao esteja selecionada
 paintSecondLeftMenuOption:
 	jal printString
-	addi t0,t0,1		#printa segundo item da lista
+	li t0,2
 	la a0,wait
 	li a1,22
 	addi a2,a2,20
-	bne t1,t0,ThirdLeftOptionOpaque	# adiciona as informacoes de de print do terceiro item da lista(excessao da cor)	
+	bne s1,t0,ThirdLeftOptionOpaque	# adiciona as informacoes de de print do terceiro item da lista(excessao da cor)	
 	li a3,39935	#cor caso a segunda opcao  esteja selecionada
 	j paintLeftThirdOption	
 ThirdLeftOptionOpaque:
@@ -292,16 +286,18 @@ paintLeftThirdOption:		#cor caso a segunda opcao nao esteja selecionada
 	
 	lw a0,0(sp)
 	lw ra,4(sp)			#restaura a0 e ra com valores da pilha
-	addi sp,sp,4
+	lw s1,8(sp)
+	addi sp,sp,12
 	ret
 	
 drawRightSideMenuOptions:	# :void,recebe em a0 indice da escolha
 	
-	addi sp,sp,-8
+	addi sp,sp,-12		
 	sw a0,0(sp)		# coloca registradores na pilha
 	sw ra,4(sp)
+	sw s1,8(sp)
 	
-	mv t1, a0 		# t1 esta com o indice da escolha
+	mv s1, a0 		# t1 esta com o indice da escolha
 	
 	li t0,0
 
@@ -310,7 +306,7 @@ drawRightSideMenuOptions:	# :void,recebe em a0 indice da escolha
 	li a2,22		# adiciona as informacoes de de print do primeiro item da lista(excessao da cor)
 	li a4,1	
 	
-	bne t1,t0,FirstRightOptionOpaque
+	bne s1,t0,FirstRightOptionOpaque
 	li a3,39935	#cor caso a primeira opcao  esteja selecionada
 	j paintFirstRightMenuOption
 	
@@ -319,29 +315,36 @@ FirstRightOptionOpaque:
 	
 paintFirstRightMenuOption:
 	jal printString		#printa primeiro item da lista
-	addi t0,t0,1
+	li t0,1
 	la a0,arma	
 	li a1,219
 	addi a2,a2,20		# adiciona as informacoes de de print do segundo item da lista(excessao da cor)
-	bne t1,t0,secondRightOptionOpaque
+	bne s1,t0,secondRightOptionOpaque
 	li a3,39935	#cor caso a segunda opcao  esteja selecionada
 	j paintSecondRightMenuOption
 secondRightOptionOpaque:
 	li a3,39844		#cor caso a segunda opcao nao esteja selecionada
 paintSecondRightMenuOption:
-	jal printString
-	addi t0,t0,1		#printa segundo item da lista
+	jal printString		#printa segundo item da lista
+	li t0,2		
 	la a0,wait
 	li a1,219
 	addi a2,a2,20
-	bne t1,t0,ThirdRightOptionOpaque	# adiciona as informacoes de de print do terceiro item da lista(excessao da cor)
-	addi a2,a2,20		
+	bne s1,t0,ThirdRightOptionOpaque	# adiciona as informacoes de de print do terceiro item da lista(excessao da cor)	
 	li a3,39935 #cor caso a segunda opcao  esteja selecionada
 	j paintRightThirdOption	
 ThirdRightOptionOpaque:
 	li a3,39844
 paintRightThirdOption:		#cor caso a segunda opcao nao esteja selecionada
 	jal printString		#printa terceiro item da lista
+
+	
+	lw a0,0(sp)		# restaura pilha pilha
+	lw ra,4(sp)
+	lw s1,8(sp)
+	addi sp,sp,12	
+		
+	ret
 
  
 	
