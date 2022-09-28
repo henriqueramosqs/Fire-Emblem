@@ -23,9 +23,15 @@
 	menu_yellow: .byte 191
 	menu_grey: .byte 164
 	
+	#enderecos dos frames
 	frame_zero: .word 0xFF000000
 	frame_one:  .word 0xFF100000
 
+	#string usadas no jogo
+	atacar: .string "Atacar"
+	arma: .string "Arma"
+	wait: .string "Passar vez"
+	
 	#necessario para printString
 	LabelTabChar:
 		.word 	0x00000000, 0x00000000, 0x10101010, 0x00100010, 0x00002828, 0x00000000, 0x28FE2828, 0x002828FE, 
@@ -58,7 +64,7 @@
 
 	li a0,1
 	
-	li s9,12		#degugging
+	li s9,1 	#degugging
 	jal runOptionsMenu	#debugging
 	
 StartLevel:	#recebe em a0 o número da fase, efetua os proicedimentos necessários
@@ -104,13 +110,13 @@ runOptionsMenu:
 	lw a5,frame_one	# prepara para chamada de procedimento de drawSquare
 	
 	li t2,10
-	bge s9,t2,drawLeftSideMenu
+	blt s9,t2,rightSideMenu
 	
-drawRightSideMenu:	
-	lb a0,menu_white
+leftSideMenu:	
+	lb a0,menu_yellow
 	li a1,20
 	li a2,20
-	li a3,30
+	li a3,82
 	li a4,1
 	
 	addi sp,sp,-4
@@ -118,13 +124,13 @@ drawRightSideMenu:
 		
 	jal drawSquare	#desenha borda superior
 	
-	li a2,105
+	li a2,70
 	
 	jal drawSquare	#desenha borda inferior
 	
 	li a2,20
 	li a3,1
-	li a4,85
+	li a4,50
 	
 		
 	jal drawSquare	#desenha borda lateral esquerda
@@ -132,28 +138,32 @@ drawRightSideMenu:
 	lw ra,(sp)
 	addi sp,sp,4
 	
-	li a1,50
+	li a1,102
 
 	jal drawSquare	#desenha borda lateral direita
 	
 	lb a0, menu_blue
 	li a1,21
 	li a2,21
-	li a3,29
-	li a4,84
+	li a3,81
+	li a4,49
 	
 	jal drawSquare	# desenha fundo do menu
 
+	jal drawLeftSideMenuOptions
+	
 	lw ra,0(sp)
 	addi sp,sp,4
+	
 	ret
+
 	
 	
-drawLeftSideMenu:	
-	lb a0,menu_white
-	li a1,270
+rightSideMenu:	
+	lb a0,menu_yellow
+	li a1,218
 	li a2,20
-	li a3,30
+	li a3,82
 	li a4,1
 	
 	addi sp,sp,-4
@@ -161,13 +171,13 @@ drawLeftSideMenu:
 		
 	jal drawSquare	#desenha borda superior
 	
-	li a2,105
+	li a2,70
 	
 	jal drawSquare	#desenha borda inferior
 	
 	li a2,20
 	li a3,1
-	li a4,85
+	li a4,50
 	
 	jal drawSquare	#desenha borda lateral esquerda
 	
@@ -176,15 +186,19 @@ drawLeftSideMenu:
 	jal drawSquare	#desenha borda lateral direita
 	
 	lb a0, menu_blue
-	li a1,271
+	li a1,219
 	li a2,21
-	li a3,29
-	li a4,84
+	li a3,81
+	li a4,49
 	
 	jal drawSquare	# desenha fundo do menu
 
+
+	jal drawRightSideMenuOptions
+	
 	lw ra,0(sp)
 	addi sp,sp,4
+	
 	ret
 
 	
@@ -228,6 +242,106 @@ printCharactersLoop:
 	j printCharactersLoop
 endPrintCharacters:
 	ret
+	
+drawLeftSideMenuOptions:	# :void,recebe em a0 indice da escolha
+	
+	addi sp,sp,-8
+	sw a0,0(sp)		# coloca registradores na pilha
+	sw ra,4(sp)
+	
+	mv t1, a0 		# t1 esta com o indice da escolha
+	
+	li t0,0
+
+	la a0, atacar
+	li a1,22
+	li a2,22		# adiciona as informacoes de de print do primeiro item da lista(excessao da cor)
+	li a4,1	
+	
+	bne t1,t0,FirstLeftOptionOpaque
+	li a3,39935	#cor caso a primeira opcao  esteja selecionada
+	j paintFirstLeftMenuOption
+	
+FirstLeftOptionOpaque:
+	li a3,39844	#cor caso a primeira opcao nao esteja selecionada
+	
+paintFirstLeftMenuOption:
+	jal printString		#printa primeiro item da lista
+	addi t0,t0,1
+	la a0,arma	
+	li a1,22
+	addi a2,a2,20		# adiciona as informacoes de de print do segundo item da lista(excessao da cor)
+	bne t1,t0,secondLeftOptionOpaque
+	li a3,39935	#cor caso a segunda opcao  esteja selecionada
+	j paintSecondLeftMenuOption
+secondLeftOptionOpaque:
+	li a3,39844		#cor caso a segunda opcao nao esteja selecionada
+paintSecondLeftMenuOption:
+	jal printString
+	addi t0,t0,1		#printa segundo item da lista
+	la a0,wait
+	li a1,22
+	addi a2,a2,20
+	bne t1,t0,ThirdLeftOptionOpaque	# adiciona as informacoes de de print do terceiro item da lista(excessao da cor)	
+	li a3,39935	#cor caso a segunda opcao  esteja selecionada
+	j paintLeftThirdOption	
+ThirdLeftOptionOpaque:
+	li a3,39844
+paintLeftThirdOption:		#cor caso a segunda opcao nao esteja selecionada
+	jal printString		#printa terceiro item da lista
+	
+	lw a0,0(sp)
+	lw ra,4(sp)			#restaura a0 e ra com valores da pilha
+	addi sp,sp,4
+	ret
+	
+drawRightSideMenuOptions:	# :void,recebe em a0 indice da escolha
+	
+	addi sp,sp,-8
+	sw a0,0(sp)		# coloca registradores na pilha
+	sw ra,4(sp)
+	
+	mv t1, a0 		# t1 esta com o indice da escolha
+	
+	li t0,0
+
+	la a0, atacar
+	li a1,219
+	li a2,22		# adiciona as informacoes de de print do primeiro item da lista(excessao da cor)
+	li a4,1	
+	
+	bne t1,t0,FirstRightOptionOpaque
+	li a3,39935	#cor caso a primeira opcao  esteja selecionada
+	j paintFirstRightMenuOption
+	
+FirstRightOptionOpaque:
+	li a3,39844	#cor caso a primeira opcao nao esteja selecionada
+	
+paintFirstRightMenuOption:
+	jal printString		#printa primeiro item da lista
+	addi t0,t0,1
+	la a0,arma	
+	li a1,219
+	addi a2,a2,20		# adiciona as informacoes de de print do segundo item da lista(excessao da cor)
+	bne t1,t0,secondRightOptionOpaque
+	li a3,39935	#cor caso a segunda opcao  esteja selecionada
+	j paintSecondRightMenuOption
+secondRightOptionOpaque:
+	li a3,39844		#cor caso a segunda opcao nao esteja selecionada
+paintSecondRightMenuOption:
+	jal printString
+	addi t0,t0,1		#printa segundo item da lista
+	la a0,wait
+	li a1,219
+	addi a2,a2,20
+	bne t1,t0,ThirdRightOptionOpaque	# adiciona as informacoes de de print do terceiro item da lista(excessao da cor)
+	addi a2,a2,20		
+	li a3,39935 #cor caso a segunda opcao  esteja selecionada
+	j paintRightThirdOption	
+ThirdRightOptionOpaque:
+	li a3,39844
+paintRightThirdOption:		#cor caso a segunda opcao nao esteja selecionada
+	jal printString		#printa terceiro item da lista
 
  
 	
@@ -494,7 +608,16 @@ endInnerLoop:
 	j drawSquareOutterLoop
 endDrawSquare:
 	ret
-	
+
+#####################################
+#  PrintSring                       #
+#  a0    =  endereco da string      #
+#  a1    =  x                       #
+#  a2    =  y                       #
+#  a3    =  cor			    #
+#  a4    =  frame(0 ou 1)	    #
+#####################################
+
 		
 printString:	
 		addi	sp, sp, -8			# aloca espaco
