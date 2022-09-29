@@ -61,10 +61,22 @@
 		0x99FF5A81, 0x99663CFF, 0x10280000, 0x00000028, 0x10081020, 0x00081020
 
 .text
-
-	li s9,11 	#degugging
-	jal runOptionsMenu	#debugging
+	#li a0,1
+	#li s9,1 	#degugging
+	#jal runOptionsMenu	#debugging
+	li a0, 0
+	li a3,320
+	li a4 240
+	lw a5,frame_one
+	jal drawSquare
 	
+	li a0, 0xc7
+	li a3,320
+	li a4 240
+	lw a5,frame_one
+	jal drawSquare
+	# : void, recebe codigo da cor em a0, coord_x em a1, coord_y  em a2, largura em a3, altura em a4, frame em a5
+	li a0,1
 StartLevel:	#recebe em a0 o número da fase, efetua os proicedimentos necessários
 	#<procedimento_de_rodar_história>
 	
@@ -75,7 +87,7 @@ StartLevel:	#recebe em a0 o número da fase, efetua os proicedimentos necessári
 	jal getLevelMap
 	
 	lw a1, frame_zero
-	jal printMap		
+	jal printMap	
 
 	li a0,1
 	jal getAllies
@@ -96,10 +108,11 @@ StartLevel:	#recebe em a0 o número da fase, efetua os proicedimentos necessári
 	jal printCharacters
 
 GameLoop:
-
 	jal runOptionsMenu	#a abre o menu de opcoes
 	
-
+	li a7,10	#finaliza
+	ecall
+	
 runOptionsMenu:
 	li t0,1
 	li t1, 0xFF200604 
@@ -143,15 +156,55 @@ leftSideMenu:
 	li a4,49
 	
 	jal drawSquare	# desenha fundo do menu
-
+	
+	li a0,0
 	jal drawLeftSideMenuOptions
+	
+	li a1,0 	#a1 marca indice da escolha
+	
+LeftMenuLoop:
+	jal readKeyBlocking
+	
+	li t1,'w'
+	beq a0,t1,leftMenuMovesUp
+	
+	li t1,'s'
+	beq a0,t1,leftMenuMovesDown
+	
+	li t1,' '
+	beq a0,t1,leftMenuChosen
+	j LeftMenuLoop
+	
+leftMenuMovesDown:
+	addi a1,a1,1
+	
+	li t1,3
+	rem a1,a1,t1
+	j leftMenuClosingSteps
+	
+leftMenuMovesUp:
+	addi a1,a1,2
+	
+	li t1,3
+	remu a1,a1,t1
+	
+leftMenuClosingSteps:	
+	mv a0,a1
+	jal drawLeftSideMenuOptions
+	mv a1,a0
+	
+	j LeftMenuLoop
+	
+leftMenuChosen:
+	li t1,2
+	beq t0, t1,FinishLeftMenu
+	
+FinishLeftMenu:
 	
 	lw ra,0(sp)
 	addi sp,sp,4
 	
 	ret
-
-	
 	
 rightSideMenu:	
 	lb a0,menu_yellow
@@ -238,10 +291,11 @@ endPrintCharacters:
 	
 drawLeftSideMenuOptions:	# :void,recebe em a0 indice da escolha
 	
-	addi sp,sp,-12
+	addi sp,sp,-16
 	sw a0,0(sp)		# coloca registradores na pilha
 	sw ra,4(sp)
 	sw s1,8(sp)
+	sw a1,12(sp)
 	
 	mv s1, a0 		# t1 esta com o indice da escolha
 	
@@ -287,7 +341,8 @@ paintLeftThirdOption:		#cor caso a segunda opcao nao esteja selecionada
 	lw a0,0(sp)
 	lw ra,4(sp)			#restaura a0 e ra com valores da pilha
 	lw s1,8(sp)
-	addi sp,sp,12
+	lw a1,12(sp)
+	addi sp,sp,16
 	ret
 	
 drawRightSideMenuOptions:	# :void,recebe em a0 indice da escolha

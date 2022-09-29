@@ -15,7 +15,7 @@ drawLeftSideMenuOptions:	# :void,recebe em a0 indice da escolha
 	li a4,1	
 	
 	bne t1,t0,FirstLeftOptionOpaque
-	li a3,39935	#cor caso a primeira opcao  esteja selecionada
+	3
 	j paintFirstLeftMenuOption
 	
 FirstLeftOptionOpaque:
