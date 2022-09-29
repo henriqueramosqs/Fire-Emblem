@@ -83,8 +83,9 @@ StartLevel:	#recebe em a0 o número da fase, efetua os proicedimentos necessári
 		#<procedimento_de_rodar_história>
 	
 	mv s11, a0 	# s11 armazena qual a fase
-	li s9,18	# s9 e s10 serao usados para marcar a posicao do cursos (coord_x e coord_y respectivamente)
+	li s9,8		# s9 e s10 serao usados para marcar a posicao do cursos (coord_x e coord_y respectivamente)
 	li s10,11
+	li s6,0		#s6 marca de quem eh o turno
 	
 	jal getLevelMap
 	
@@ -110,7 +111,14 @@ StartLevel:	#recebe em a0 o número da fase, efetua os proicedimentos necessári
 	jal printCharacters
 
 GameLoop:
+	beq s6,zero,UserTurn
+	#jal machineTurn	#implementar
+	j changeTurn
+UserTurn:
 	jal runOptionsMenu	#a abre o menu de opcoes
+changeTurn:	
+	xori s6,s6,1
+	j GameLoop
 	
 	li a7,10	#finaliza
 	ecall
@@ -214,14 +222,11 @@ FinishLeftMenu:
 	ret
 	
 OpenLeftWeaponChoice:
-	addi sp,sp,-4
-	sw a0,0(sp)
-	
-	li a0,0	# maraca que deves-se usar o lado direito
+	li a0,0	# marca que deves-se usar o lado direito
 	jal OpenWeaponChoice
 	
-	lw a0,(sp)
-	addi sp,sp,4
+	j LeftMenuLoop
+
 	ret
 	
 
@@ -314,22 +319,40 @@ FinishRightMenu:
 	ret
 	
 OpenRightWeaponChoice:
-	addi sp,sp,-4
-	sw a0,0(sp)
+
 	
 	li a0,1		# maraca que deves-se usar o lado direito
 	jal OpenWeaponChoice
 	
-	lw a0,(sp)
-	addi sp,sp,4
+	j rightMenuLoop
 	
 	ret
 	
 OpenWeaponChoice:	#recebe em a0 lado da barrea de menu -> 0 para esquerda, 1 para direita
 	addi sp,sp,-8
 	sw ra,0(sp)
-	sw a0,0(sp)
+	sw a0,4(sp)
 	jal getWeaponDrawPosition # armazena as coordenadas de pintura da caixinha a1,a2, de acordo com o que recebeu em a0
+	
+	lb a0,menu_white
+	addi a1,a1,-2
+	addi a2,a2,-2
+	li a3,20		#printa caixa externa(margens)
+	li a4,20
+	
+	jal drawSquare
+	
+	lb a0,menu_blue
+	addi a1,a1,1	#pinta fundo
+	addi a2,a2,1
+	
+	li a3,18
+	li a4,18
+	
+	jal drawSquare
+	
+	addi a1,a1,1	#restaura os valores de pinura das weapons
+	addi a2,a2,1
 	
 	jal getCharacterByCoordinate #pega o persoangem
 	
@@ -338,6 +361,7 @@ OpenWeaponChoice:	#recebe em a0 lado da barrea de menu -> 0 para esquerda, 1 par
 	mv a0,s0
 	jal getWeaponImage	 		#oega sprite da arma 
 	lw a3,frame_one 	#desenha arma do persoagem
+	
 	jal drawImage
 	
 weaponChoiceLoop:
@@ -354,9 +378,21 @@ weaponChoiceLoop:
 	j weaponChoiceLoop
 	
 weaponChoiceLoopUp:
+
+	lb a0,menu_blue
+	mv a5,a3		#tampa imagem anterior
+	addi a1,a1,-1
+	addi a2,a2,-1
+	li a3,18
+	li a4,18
+	jal drawSquare
+	addi a1,a1,1
+	addi a2,a2,1
+
+	mv a3,a5
+	
 	addi s0,s0,2
 	li t1,3
-	
 	rem s0,s0,t1
 	mv a0,s0
 	jal getWeaponImage	
@@ -364,10 +400,21 @@ weaponChoiceLoopUp:
 	
 	j weaponChoiceLoop
 	
-weaponChoiceLoopDown:
+weaponChoiceLoopDown:	
+	lb a0,menu_blue
+	mv a5,a3		#tampa imagem anterior
+	addi a1,a1,-1
+	addi a2,a2,-1
+	li a3,18
+	li a4,18
+	jal drawSquare
+	addi a1,a1,1
+	addi a2,a2,1
+	
+	mv a3,a5
+	
 	addi s0,s0,1
 	li t1,3
-	
 	rem s0,s0,t1
 	mv a0,s0
 	jal getWeaponImage	
@@ -380,11 +427,17 @@ weaponChosen:
 	sw s0,3(a0)	#salva arma do personagem
 	
 	lb a0,menu_blue
-	li a3,16
-	li a4,16		# apaga imagem da arma
+	addi a1,a1,-2
+	addi a2,a2,-2
+	li a3,20
+	li a4,20		# apaga imagem da arma
 	lw a5,frame_one
 	jal drawSquare
-			
+	
+	lw ra,0(sp)
+	lw a0,4(sp)
+	addi sp,sp,-8
+					
 	ret		#retorna
 	
 getWeaponImage:	#recebe em a0 o codigo da arma, retorna em a0 o sprite da imagem ou -1 caso nao encontrado
@@ -424,10 +477,10 @@ getWeaponDrawPosition:	#recebe em em a0 (0,1) =(esq,dir),retorna em a1, e a2 as 
 	ret
 	
 leftWeaponPosition:
-	li a1,60	#hipotetico
+	li a1,60
 	ret
 rightWeaponPosition:
-	li a1,270	#hipotetico
+	li a1,258	#hipotetico
 		
 	ret
 
