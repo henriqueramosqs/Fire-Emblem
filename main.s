@@ -124,6 +124,9 @@ changeTurn:
 	ecall
 	
 runOptionsMenu:
+	addi sp,sp,-4
+	sw ra,0(sp)
+	
 	li t0,1
 	li t1, 0xFF200604 
 	sb t0,0(t1)	# troca de frame
@@ -140,8 +143,6 @@ leftSideMenu:
 	li a3,82
 	li a4,1
 	
-	addi sp,sp,-4
-	sw ra,0(sp)
 		
 	jal drawSquare	#desenha borda superior
 	
@@ -237,9 +238,6 @@ rightSideMenu:
 	li a3,82
 	li a4,1
 	
-	addi sp,sp,-4
-	sw ra,0(sp)
-		
 	jal drawSquare	#desenha borda superior
 	
 	li a2,70
@@ -326,12 +324,12 @@ OpenRightWeaponChoice:
 	
 	j rightMenuLoop
 	
-	ret
 	
 OpenWeaponChoice:	#recebe em a0 lado da barrea de menu -> 0 para esquerda, 1 para direita
 	addi sp,sp,-8
 	sw ra,0(sp)
 	sw a0,4(sp)
+	
 	jal getWeaponDrawPosition # armazena as coordenadas de pintura da caixinha a1,a2, de acordo com o que recebeu em a0
 	
 	lb a0,menu_white
@@ -436,7 +434,7 @@ weaponChosen:
 	
 	lw ra,0(sp)
 	lw a0,4(sp)
-	addi sp,sp,-8
+	addi sp,sp,8
 					
 	ret		#retorna
 	
@@ -965,7 +963,7 @@ NaoPulaLinha:	addi    s0, s0, 1			# proximo caractere
     		j       loopprintString       		# volta ao loop
 
 fimloopprintString:	lw      ra, 0(sp)    		# recupera ra
-			lw 	s0, 0(sp)		# recupera s0 original
+			lw 	s0, 4(sp)		# recupera s0 original
     			addi    sp, sp, 8		# libera espaco
 fimprintString:	ret      	    			# retorna
 
@@ -1070,4 +1068,3 @@ printChar.endForChar2I:
 			
 			ret	
 	
-
