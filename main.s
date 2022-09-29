@@ -65,9 +65,7 @@
 		0x99FF5A81, 0x99663CFF, 0x10280000, 0x00000028, 0x10081020, 0x00081020
 
 .text
-	#li a0,1
-	#li s9,1 	#degugging
-	#jal runOptionsMenu	#debugging
+
 	li a0, 0
 	li a3,320
 	li a4 240
@@ -79,14 +77,14 @@
 	li a4 240
 	lw a5,frame_one
 	jal drawSquare
-	# : void, recebe codigo da cor em a0, coord_x em a1, coord_y  em a2, largura em a3, altura em a4, frame em a5
+	
 	li a0,1
 StartLevel:	#recebe em a0 o número da fase, efetua os proicedimentos necessários
-	#<procedimento_de_rodar_história>
+		#<procedimento_de_rodar_história>
 	
 	mv s11, a0 	# s11 armazena qual a fase
-	li s9,10 	# s9 e s10 serao usados para marcar a posicao do cursos (coord_x e coord_y respectivamente)
-	li s10,7
+	li s9,18	# s9 e s10 serao usados para marcar a posicao do cursos (coord_x e coord_y respectivamente)
+	li s10,11
 	
 	jal getLevelMap
 	
@@ -96,7 +94,7 @@ StartLevel:	#recebe em a0 o número da fase, efetua os proicedimentos necessári
 	li a0,1
 	jal getAllies
 	
-	mv s8,a0	# s8 armazena endereco dos aliados  (sera bastante usado)
+	mv s7,a0	# s7 armazena endereco dos aliados  (sera bastante usado)
 	
 	la a1,Hero
 	lw a2,frame_zero	# printa aliados
@@ -176,7 +174,7 @@ LeftMenuLoop:
 	beq a0,t1,leftMenuMovesDown
 	
 	li t1,' '
-	beq a0,t1,leftMenuChosen
+	beq a0,t1,LeftMenuChosen
 	j LeftMenuLoop
 	
 leftMenuMovesDown:
@@ -199,9 +197,14 @@ leftMenuClosingSteps:
 	
 	j LeftMenuLoop
 	
-leftMenuChosen:
+LeftMenuChosen:
+	li t1,1
+	beq t1,a1,OpenLeftWeaponChoice
+	
 	li t1,2
-	beq t0, t1,FinishLeftMenu
+	beq a1, t1,FinishLeftMenu
+
+	j LeftMenuLoop
 	
 FinishLeftMenu:
 	
@@ -210,6 +213,18 @@ FinishLeftMenu:
 	
 	ret
 	
+OpenLeftWeaponChoice:
+	addi sp,sp,-4
+	sw a0,0(sp)
+	
+	li a0,0	# maraca que deves-se usar o lado direito
+	jal OpenWeaponChoice
+	
+	lw a0,(sp)
+	addi sp,sp,4
+	ret
+	
+
 rightSideMenu:	
 	lb a0,menu_yellow
 	li a1,218
@@ -244,14 +259,208 @@ rightSideMenu:
 	
 	jal drawSquare	# desenha fundo do menu
 
+	li a0,0
 	jal drawRightSideMenuOptions
+	
+	li a1,0 	#a1 marca indice da escolha
+	
+rightMenuLoop:
+	jal readKeyBlocking
+	
+	li t1,'w'
+	beq a0,t1,rightMenuMovesUp
+	
+	li t1,'s'
+	beq a0,t1,rightMenuMovesDown
+	
+	li t1,' '
+	beq a0,t1,rightMenuChosen
+	j rightMenuLoop
+	
+rightMenuMovesDown:
+	addi a1,a1,1
+	
+	li t1,3
+	rem a1,a1,t1
+	j rightMenuClosingSteps
+	
+rightMenuMovesUp:
+	addi a1,a1,2
+	
+	li t1,3
+	remu a1,a1,t1
+	
+rightMenuClosingSteps:	
+	mv a0,a1
+	jal drawRightSideMenuOptions
+	mv a1,a0
+	
+	j rightMenuLoop
+	
+rightMenuChosen:
+	li t1,1
+	beq t1,a1,OpenRightWeaponChoice
+	
+	li t1,2
+	beq a1, t1,FinishRightMenu
+
+	j rightMenuLoop
+	
+FinishRightMenu:
 	
 	lw ra,0(sp)
 	addi sp,sp,4
 	
 	ret
+	
+OpenRightWeaponChoice:
+	addi sp,sp,-4
+	sw a0,0(sp)
+	
+	li a0,1		# maraca que deves-se usar o lado direito
+	jal OpenWeaponChoice
+	
+	lw a0,(sp)
+	addi sp,sp,4
+	
+	ret
+	
+OpenWeaponChoice:	#recebe em a0 lado da barrea de menu -> 0 para esquerda, 1 para direita
+	addi sp,sp,-8
+	sw ra,0(sp)
+	sw a0,0(sp)
+	jal getWeaponDrawPosition # armazena as coordenadas de pintura da caixinha a1,a2, de acordo com o que recebeu em a0
+	
+	jal getCharacterByCoordinate #pega o persoangem
+	
+	lb s0,3(a0) 	# pega a arma do personagem
+
+	mv a0,s0
+	jal getWeaponImage	 		#oega sprite da arma 
+	lw a3,frame_one 	#desenha arma do persoagem
+	jal drawImage
+	
+weaponChoiceLoop:
+	jal readKeyBlocking
+	li t0,'w'
+	beq a0,t0,weaponChoiceLoopUp
+	
+	li t0,'s'	
+	beq a0,t0,weaponChoiceLoopDown
+		
+	li t0,' '
+	beq a0,t0,weaponChosen
+	
+	j weaponChoiceLoop
+	
+weaponChoiceLoopUp:
+	addi s0,s0,2
+	li t1,3
+	
+	rem s0,s0,t1
+	mv a0,s0
+	jal getWeaponImage	
+	jal drawImage		
+	
+	j weaponChoiceLoop
+	
+weaponChoiceLoopDown:
+	addi s0,s0,1
+	li t1,3
+	
+	rem s0,s0,t1
+	mv a0,s0
+	jal getWeaponImage	
+	jal drawImage		
+	
+	j weaponChoiceLoop
+
+weaponChosen:
+	jal getCharacterByCoordinate #pega o persoangem
+	sw s0,3(a0)	#salva arma do personagem
+	
+	lb a0,menu_blue
+	li a3,16
+	li a4,16		# apaga imagem da arma
+	lw a5,frame_one
+	jal drawSquare
+			
+	ret		#retorna
+	
+getWeaponImage:	#recebe em a0 o codigo da arma, retorna em a0 o sprite da imagem ou -1 caso nao encontrado
+	li t0,0
+	beq a0,t0,getComputerImage
+	
+	li t0,1
+	beq a0,t0,getCalculatorImage
+	
+	li t0,2
+	beq a0,t0,getPencilImage
+	
+	li a0,-1
+	ret
+
+getComputerImage:
+	la a0,computer
+	ret
+	
+getCalculatorImage:	
+	la a0,calculator
+	ret
+	
+getPencilImage:
+	la a0,pencil
+	ret
 
 	
+getWeaponDrawPosition:	#recebe em em a0 (0,1) =(esq,dir),retorna em a1, e a2 as posicoes de desenho ou -1 caso excecao
+	
+	li a2, 39
+	beq a0,zero,leftWeaponPosition
+	li t0,1
+	beq a0,t0,rightWeaponPosition
+	li a1,-1
+	li a2,-1
+	ret
+	
+leftWeaponPosition:
+	li a1,60	#hipotetico
+	ret
+rightWeaponPosition:
+	li a1,270	#hipotetico
+		
+	ret
+
+	
+	
+getCharacterByCoordinate:	# retorna em a0 a o endereco base do personagem que esta selecionado pelo cursor ou -1 caso nao enconrtrado
+  
+  	lb t2, 0(s7)	# t2 armazena quantidade de personagens
+	addi a0, s7,1	# a0 marca endereco de comeco de descricao dos personagens
+	
+	slli t2,t2,2	
+	add t2,t2,a0	#t2 marca vector.end() (primeiro endereco nao pertencente ao vetor)
+
+getCharacterByCoordinateLoop:
+ 	beq t2,a0,endGetCharacterByCoordinate
+ 	
+	lb t0,0(a0)	# pega coordenada x
+	lb t1,1(a0)	# pega coordenada y
+	
+	bne t0,s9,keepGetCharacterByCoordinateLoop	#se nao encontrou, vai para a proxima iteracao
+	bne t1,s10,keepGetCharacterByCoordinateLoop
+	 			      
+	ret	#achou o personagem, retornou o endereco
+	
+keepGetCharacterByCoordinateLoop:
+	addi a0,a0,4	#vai para proxima descricao de personagem
+	j getCharacterByCoordinateLoop
+	
+endGetCharacterByCoordinate:		#nao foi encontrado
+	li a0,1
+	ret
+
+
 printCharacters:	# recebe em a0 o arquivo de allies/enemies, em a1 endereço do sprite, em a2 o endereco da frame
 	addi sp,sp,-12			#sobrescreve s0,s1,s2 (colocar na pilha)
 	sw s0,0(sp)	
@@ -727,7 +936,11 @@ fimprintString:	ret      	    			# retorna
 #	t9 foi convertido para s9 pois nao ha registradores temporarios sobrando dentro desta funcao
 
 
-printChar:	li 	t4, 0xFF	# t4 temporario
+printChar:	
+		addi sp,sp,-4
+		sw s9,0(sp)
+		
+		li 	t4, 0xFF	# t4 temporario
 		slli 	t4, t4, 8	# t4 = 0x0000FF00 (no RARS, nao podemos fazer diretamente "andi rd, rs1, 0xFF00")
 		and    	t5, a3, t4   	# t5 obtem cor de fundo
     		srli	t5, t5, 8	# numero da cor de fundo
@@ -798,6 +1011,10 @@ printChar.endForChar2J:	addi	t0, t0, -1 		# i--
     			addi    t4, t4, 328		#
     			j       printChar.forChar2I	# volta ao loop
 
-printChar.endForChar2I:	ret	
+printChar.endForChar2I:	
+			lw s9,0(sp)
+			addi sp,sp,4
+			
+			ret	
 	
 
