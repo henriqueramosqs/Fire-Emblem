@@ -16,6 +16,10 @@
 	.include "images_data/Hero.data"
 	.include "images_data/Enemy.data"
 	
+	#others
+	.include "images_data/computer.data"
+	.include "images_data/calculator.data"
+	.include "images_data/pencil.data"
 	
 	#Cores
 	menu_blue: .byte 155 
