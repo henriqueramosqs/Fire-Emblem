@@ -1,0 +1,13 @@
+os arquivo de inimigos de aliados sao do tipo:
+
+<quantidade>
+
+<pos_x>,<pos_y>,<quantidade_de_vida_restante>, <codigo_da_arma_selecionada>
+<pos_x>,<pos_y>,<quantidade_de_vida_restante>, <codigo_da_arma_selecionada>
+<pos_x>,<pos_y>,<quantidade_de_vida_restante>, <codigo_da_arma_selecionada>
+
+Computador ganha da calculadora
+calculadora ganha do lapis
+lapis ganha don Computador
+
+runPorrada:     # recebe em a0 endereco do aliado, em a1 o do inimigo e faz animacao, altera a quantidade de vida

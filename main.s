@@ -1,7 +1,10 @@
 .data
 	#tiles
 	.include "images_data/Bush.data"
+	.include "images_data/HighlightedBush.data"
+	
 	.include "images_data/Grass.data"
+	.include "images_data/HighlightedGrass.data"
 	
 	#mapas
 	.include "maps/Mapa_fase1.data"
@@ -80,41 +83,31 @@
 	
 	li a0,1
 StartLevel:	#recebe em a0 o número da fase, efetua os proicedimentos necessários
+		
 		#<procedimento_de_rodar_história>
 	
 	mv s11, a0 	# s11 armazena qual a fase
-	li s9,8		# s9 e s10 serao usados para marcar a posicao do cursos (coord_x e coord_y respectivamente)
-	li s10,11
+	li s9,10		# s9 e s10 serao usados para marcar a posicao do cursos (coord_x e coord_y respectivamente)
+	li s10,7
 	li s6,0		#s6 marca de quem eh o turno
 	
 	jal getLevelMap
+	mv s5,a0	#s5 armazena endereco do mapa da fase 
 	
 	lw a1, frame_zero
 	jal printMap	
 
-	li a0,1
-	jal getAllies
-	
-	mv s7,a0	# s7 armazena endereco dos aliados  (sera bastante usado)
-	
-	la a1,Hero
-	lw a2,frame_zero	# printa aliados
-	jal printCharacters
-	
-	li a0,1
-	jal getEnemies
-	
-	mv s8,a0	# s8 armazena endereco dos inimigos  (sera bastante usado)
-	
-	la a1,Enemy	
-	lw a2,frame_zero	# printa inimigos
-	jal printCharacters
+	mv a0,s11
+	jal printAllCharacters
 
 GameLoop:
 	beq s6,zero,UserTurn
 	#jal machineTurn	#implementar
 	j changeTurn
 UserTurn:
+	jal runMovingOptions
+	mv a0,s11
+	jal printAllCharacters
 	jal runOptionsMenu	#a abre o menu de opcoes
 changeTurn:	
 	xori s6,s6,1
@@ -438,6 +431,117 @@ weaponChosen:
 					
 	ret		#retorna
 	
+runMovingOptions:	#a posicao do cursor estah em (s9,s10)
+
+	addi sp,sp,-20		#colocar coisas na pilha
+	sw ra,0(sp)
+	sw s0,4(sp)
+	sw s1,8(sp)
+	sw s2,12(sp)
+	sw s3,16(sp)
+	
+	addi s0,s9,-5   #	
+	addi s1,s10,-5	# posicao do canto esquerdo do quadrado que deve ser pintado
+	
+	addi s2,s0,12	#condicoes de parada
+	addi s3,s1,12	
+	
+runMovingOptionsOutterLoop:
+	beq s1,s3,endMovingOptionsOutterLoop
+runMovingOptionsInnerLoop:
+	beq s0,s2,endMovingOptionsInnerLoop
+
+	li t0,0
+	blt s0,t0,skipHighlightThisSquare
+	blt s1,t0,skipHighlightThisSquare
+	li t0,20
+	bge s0,t0,skipHighlightThisSquare	#checam se o quadrado em questao esta dentro do bitmap
+	li t0,15
+	bge s1,t0,endMovingOptionsInnerLoop
+	
+	mv a0,s0
+	mv a1,s1
+	mv a2,s9
+	mv a3,s10
+	jal getManhathamDistance
+	li t0,5
+	bgt a0,t0,skipHighlightThisSquare
+	
+	mv a0,s0
+	mv a1,s1
+	jal getHighlightedTile
+	
+	slli a1,s0,4		#pinta o quadrado correspondente
+	slli a2,s1,4
+	lw a3,frame_zero
+	jal drawImage		
+	
+skipHighlightThisSquare:
+	addi s0,s0,1
+	j runMovingOptionsInnerLoop
+	
+endMovingOptionsInnerLoop:
+	addi s1,s1,1
+	addi s0,s9,-5
+	j runMovingOptionsOutterLoop
+endMovingOptionsOutterLoop:
+	lw ra,0(sp)
+	lw s0,4(sp)
+	lw s1,8(sp)
+	lw s2,12(sp)
+	lw s3,16(sp)
+	
+	ret
+	
+getTileCode:	# recebe em (a0,a1)=(x,y) a posicao do quadrado, retorna em a0 o codigo do tile	
+	li t0,20
+	mul t0,t0,a1
+	add t0,t0,a0
+	add t0,t0,s5	# t0 tem endereco da posicao
+	lb a0,0(t0)
+	ret
+	
+getHighlightedTile:	#recebe em (a0,a1)=(x,y) a posicao do quadrado, retorna o endereco da imagem
+	addi sp,sp,-4
+	sw ra,0(sp)
+	
+	jal getTileCode
+	li t0,1
+	beq a0,t0,getHighlightedGrass
+	
+	li t0,2
+	beq a0,t0,getHighlightedBush
+	
+	li a0,-1
+	ret
+	
+getHighlightedGrass:
+	la a0,HighlightedGrass	
+	j endGetHighlightedTile
+getHighlightedBush:
+	la a0,HighlightedBush	
+	j endGetHighlightedTile
+endGetHighlightedTile:
+	lw ra,0(sp)
+	addi sp,sp,4
+	ret
+
+
+	
+getManhathamDistance: 	#retorna em a0 a distancia manhatham de (a0,a1) para (a2,a3)
+	sub t0,a0,a2
+	sub t1, a1,a3
+	li  t2,0
+	li t3,-1
+	bge t0,t2,Ymodule
+	mul t0,t0,t3
+Ymodule:
+	 bge t1,t2,endGetManhathamDistance
+	 mul t1,t1,t3
+endGetManhathamDistance:
+	add a0,t1,t0
+	ret
+	
 getWeaponImage:	#recebe em a0 o codigo da arma, retorna em a0 o sprite da imagem ou -1 caso nao encontrado
 	li t0,0
 	beq a0,t0,getComputerImage
@@ -463,6 +567,16 @@ getPencilImage:
 	la a0,pencil
 	ret
 
+getPositionTile:	# retorna codigo do tile em posicao definida por (a0,a1)=(coord_x,coord_y)
+	add t0,s5,a0
+	
+	li t1,20
+	mul t1,t1,a1
+
+	add t1,t1,t0	#t1 armazena endereco da posicao
+	lb a0,0(t1)
+	ret
+	
 	
 getWeaponDrawPosition:	#recebe em em a0 (0,1) =(esq,dir),retorna em a1, e a2 as posicoes de desenho ou -1 caso excecao
 	
@@ -478,7 +592,7 @@ leftWeaponPosition:
 	li a1,60
 	ret
 rightWeaponPosition:
-	li a1,258	#hipotetico
+	li a1,258	
 		
 	ret
 
@@ -511,6 +625,31 @@ endGetCharacterByCoordinate:		#nao foi encontrado
 	li a0,1
 	ret
 
+printAllCharacters:	#recebe em a0 o numero da fase, printa todos correrspondentes no mapa
+	addi sp,sp,-8
+	sw a0,0(sp)
+	sw ra,4(sp)
+	
+	jal getAllies
+	
+	mv s7,a0	# s7 armazena endereco dos aliados  (sera bastante usado)
+	
+	la a1,Hero
+	lw a2,frame_zero	# printa aliados
+	jal printCharacters
+	
+	lw a0,0(sp)
+	jal getEnemies
+	
+	mv s8,a0	# s8 armazena endereco dos inimigos  (sera bastante usado)
+	
+	la a1,Enemy	
+	lw a2,frame_zero	# printa inimigos
+	jal printCharacters
+	
+	lw ra,4(sp)
+	addi sp,sp,8
+	ret
 
 printCharacters:	# recebe em a0 o arquivo de allies/enemies, em a1 endereço do sprite, em a2 o endereco da frame
 	addi sp,sp,-12			#sobrescreve s0,s1,s2 (colocar na pilha)
@@ -550,7 +689,11 @@ printCharactersLoop:
 	
 	addi s1,s1,1
 	j printCharactersLoop
-endPrintCharacters:
+endPrintCharacters:	
+	lw s0,0(sp)	
+	lw s1,4(sp)
+	lw s2,8(sp)
+	addi sp,sp,12	
 	ret
 	
 drawLeftSideMenuOptions:	# :void,recebe em a0 indice da escolha
@@ -730,13 +873,13 @@ enemiesLevel5:
 getLevelMap: # recebe em a0 numero da fase, retorna em a0 o endereco do mapa ou -1 se mapa da fase nao foi encontrado
 	 li t0,1
 	 beq a0, t0,mapLevel1  #checa se a0=1
-	 addi t0,t0,1
+	 addi t0,t0,2
 	 beq a0,t0,mapLevel2 #checa se a0=2
-	 addi t0,t0,1
+	 addi t0,t0,3
 	 beq a0,t0,mapLevel3 #checa se a0=3
-	 addi t0,t0,1
+	 addi t0,t0,4
 	 beq a0,t0,mapLevel4 #checa se a0=4
-	 addi t0,t0,1
+	 addi t0,t0,5
 	 beq a0,t0,mapLevel5 #checa se a0=5
 	 li a0,-1
 	 ret
