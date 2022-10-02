@@ -105,6 +105,7 @@ GameLoop:
 	#jal machineTurn	#implementar
 	j changeTurn
 UserTurn:
+	jal pickCharacter
 	jal runMovingOptions
 	mv a0,s11
 	jal printAllCharacters
@@ -115,6 +116,144 @@ changeTurn:
 	
 	li a7,10	#finaliza
 	ecall
+	
+pickCharacter:
+	addi sp,sp,-4
+	sw ra,0(sp)
+pickCharacterLoop:
+	jal readKeyBlocking
+	
+	li t0,'w'
+	beq a0,t0, moveCursorUp
+	
+	li t0,'a'
+	beq a0,t0, moveCursorLeft
+	
+	li t0,'s'
+	beq a0,t0, moveCursorDown
+	
+	li t0,'d'
+	beq a0,t0, moveCursorRight
+	
+	li t0,' '
+	beq a0,t0,characterPicked
+					#se nao for nenhum dos casos, reitera o loop
+	j pickCharacterLoop
+moveCursorUp:
+	mv a0,s9		#pinta posicao anterior
+	mv a1,s10
+	jal resetMapPosition
+	
+	li t0,0				#faz os calculos da posicao do cursor
+	ble s10,t0,donnutUp
+	addi s10,s10,-1
+	j finishMoveCursorUp
+donnutUp:
+	addi s10,s10,14	
+finishMoveCursorUp:
+	li t0,15
+	rem s10,s10,t0
+	j paintCursor
+	
+moveCursorLeft:
+	mv a0,s9		#pinta posicao anterior
+	mv a1,s10
+	jal resetMapPosition
+	
+	li t0,0				#faz os calculos da posicao do cursor
+	ble s9,t0,donnutLeft
+	addi s9,s9,-1
+	j finishMoveCursorLeft
+donnutLeft:
+	addi s9,s9,19
+finishMoveCursorLeft:
+	li t0,20
+	rem s9,s9,t0
+	j paintCursor
+	
+moveCursorRight:
+	mv a0,s9		#pinta posicao anterior
+	mv a1,s10
+	jal resetMapPosition
+	addi s9,s9,1
+	li t0,20
+	rem s9,s9,t0
+	j paintCursor
+moveCursorDown:
+	mv a0,s9		#pinta posicao anterior
+	mv a1,s10
+	jal resetMapPosition
+	addi s10,s10,1
+	li t0,15
+	rem s10,s10,t0
+paintCursor:
+	mv a0,s9
+	mv a1,s10
+	jal paintBorder
+	
+	mv a0,s11
+	jal printAllCharacters	#pinta os personagens de novo
+	
+	j pickCharacterLoop	
+	
+characterPicked:
+
+	jal getCharacterByCoordinate
+	li t0,-1
+	beq a0,t0,pickCharacterLoop	# se o espaco clicado nao tiver personagem, reitera o loop
+	
+	lw ra,0(sp)
+	addi sp,sp,4
+	ret		#caso tiver, retorna
+	
+paintBorder: 	#recebe em (a0,a1) a posicao do mapa e pinta borda lá
+	
+	addi sp,sp,-4
+	sw ra,0(sp)
+	
+	slli a2,a1,4	
+	slli a1,a0,4
+	addi a2,a2,1
+	addi a1,a1,1
+
+	lb a0,menu_white
+	lw a5,frame_zero
+	li a3,14
+	li a4,1
+	jal drawSquare
+	
+	li a3,1
+	li a4,14
+	jal drawSquare
+	
+	addi a1,a1,14
+	jal drawSquare
+	
+	addi a1,a1,-14
+	addi a2,a2,14
+	li a3,14
+	li a4,1
+	jal drawSquare
+	
+	lw ra,0(sp)
+	addi sp,sp,4
+	ret
+	
+	
+resetMapPosition: 	#reseta tile do mapa na posicao a0,a1
+	addi sp,sp,-4
+	sw ra,0(sp)
+	
+	jal getTileCode
+	jal getTile	
+	slli a1,s9,4
+	slli a2,s10,4
+	lw a3,frame_zero
+	jal drawImage
+	
+	lw ra,0(sp)
+	addi sp,sp,4
+	ret
 	
 runOptionsMenu:
 	addi sp,sp,-4
@@ -622,7 +761,7 @@ keepGetCharacterByCoordinateLoop:
 	j getCharacterByCoordinateLoop
 	
 endGetCharacterByCoordinate:		#nao foi encontrado
-	li a0,1
+	li a0,-1
 	ret
 
 printAllCharacters:	#recebe em a0 o numero da fase, printa todos correrspondentes no mapa
