@@ -106,9 +106,10 @@ GameLoop:
 	j changeTurn
 UserTurn:
 	jal pickCharacter
-	jal runMovingOptions
+	jal paintMovingOptions
 	mv a0,s11
 	jal printAllCharacters
+	jal changePosition
 	jal runOptionsMenu	#a abre o menu de opcoes
 changeTurn:	
 	xori s6,s6,1
@@ -207,6 +208,162 @@ characterPicked:
 	addi sp,sp,4
 	ret		#caso tiver, retorna
 	
+changePosition:
+	mv s0,s9		#s0 e s1 serao cursores auxiliares
+	mv s1,s10
+changePositionLoop:
+	jal readKeyBlocking
+	li t0,'w'
+	beq a0,t0,changePositionUp
+	
+	li t0,'a'
+	beq a0,t0,changePositionLeft
+	
+	li t0,'s'
+	beq a0,t0,changePositionDown
+
+	li t0,'d'
+	beq a0,t0,changePositionRight
+	
+	li t0,' '
+	beq a0,t0,confirmChangePosition
+
+	j changePositionLoop
+ 
+changePositionUp:
+	mv a0,s0
+	mv a1,s1
+	jal resetHighlightedMapPosition
+	mv a0,s11
+	jal printAllCharacters 
+	
+	addi s1,s1,-1
+	mv a0,s0
+	mv a1,s1
+	mv a2,s9
+	mv a3,s10
+	jal getManhathamDistance
+	
+	li t0,5
+	bgt a0,t0,DonnutMovingOptionsUp
+	j finishNextMovementPosition
+
+DonnutMovingOptionsUp:	
+	mv a0,s0
+	li a1,0
+	mv a2,s9
+	li a3,0
+	jal getManhathamDistance
+	
+	sub s1,s10,a0
+	addi s1,s1,5
+	
+	j finishNextMovementPosition
+	
+changePositionDown:
+	mv a0,s0
+	mv a1,s1
+	jal resetHighlightedMapPosition
+	mv a0,s11
+	jal printAllCharacters 
+	
+	addi s1,s1,1
+	mv a0,s0
+	mv a1,s1
+	mv a2,s9
+	mv a3,s10
+	jal getManhathamDistance
+	
+	li t0,5
+	bgt a0,t0,DonnutMovingOptionsDown
+	j finishNextMovementPosition
+	
+DonnutMovingOptionsDown:	
+	mv a0,s0
+	li a1,0
+	mv a2,s9
+	li a3,0
+	jal getManhathamDistance
+	
+	add s1,a0,s10
+	addi s1,s1,-5
+	
+	j finishNextMovementPosition
+	
+changePositionRight:
+	mv a0,s0
+	mv a1,s1
+	jal resetHighlightedMapPosition
+	mv a0,s11
+	jal printAllCharacters 
+	
+	addi s0,s0,1
+	mv a0,s0
+	mv a1,s1
+	mv a2,s9
+	mv a3,s10
+	jal getManhathamDistance
+	
+	li t0,5
+	bgt a0,t0,DonnutMovingOptionsRight
+	j finishNextMovementPosition
+	
+DonnutMovingOptionsRight:	
+	li a0,0
+	mv a1,s1
+	li a2,0
+	mv a3,s10
+	jal getManhathamDistance
+	
+	add s0,a0,s9
+	addi s0,s0,-5
+	
+	j finishNextMovementPosition
+				
+changePositionLeft:
+	mv a0,s0
+	mv a1,s1
+	jal resetHighlightedMapPosition
+	mv a0,s11
+	jal printAllCharacters 
+	
+	addi s0,s0,-1
+	mv a0,s0
+	mv a1,s1
+	mv a2,s9
+	mv a3,s10
+	jal getManhathamDistance
+	
+	li t0,5
+	bgt a0,t0,DonnutMovingOptionsLeft
+	j finishNextMovementPosition
+	
+DonnutMovingOptionsLeft:	
+	li a0,0
+	mv a1,s1
+	li a2,0
+	mv a3,s10
+	jal getManhathamDistance
+	
+	addi s0,s9,5
+	sub s0,s0,a0
+				
+finishNextMovementPosition:
+	mv a0,s0
+	mv a1,s1
+	jal paintBorder
+	j changePositionLoop
+confirmChangePosition:
+	jal resetMovingOptions
+	
+	mv s9,s0
+	mv s10,s1
+	
+	jal printAllCharacters
+	
+	ret
+	
+	
 paintBorder: 	#recebe em (a0,a1) a posicao do mapa e pinta borda lá
 	
 	addi sp,sp,-4
@@ -253,6 +410,26 @@ resetMapPosition: 	#reseta tile do mapa na posicao a0,a1
 	jal drawImage
 	
 	lw ra,0(sp)
+	addi sp,sp,4
+	ret
+	
+resetHighlightedMapPosition: 	#reseta tile em destaque do mapa na posicao a0,a1
+	addi sp,sp,-8
+	sw ra,0(sp)
+	sw s1,4(sp)
+	
+	slli a2,a1,4
+	slli s1,a0,4	
+	
+	jal getHighlightedTile
+
+	mv a1,s1
+	
+	lw a3,frame_zero
+	jal drawImage
+	
+	lw ra,0(sp)
+	lw s1,4(sp)
 	addi sp,sp,4
 	ret
 	
@@ -571,7 +748,7 @@ weaponChosen:
 					
 	ret		#retorna
 	
-runMovingOptions:	#a posicao do cursor estah em (s9,s10)
+paintMovingOptions:	#a posicao do cursor estah em (s9,s10)
 
 	addi sp,sp,-20		#colocar coisas na pilha
 	sw ra,0(sp)
@@ -586,9 +763,9 @@ runMovingOptions:	#a posicao do cursor estah em (s9,s10)
 	addi s2,s0,12	#condicoes de parada
 	addi s3,s1,12	
 	
-runMovingOptionsOutterLoop:
+paintMovingOptionsOutterLoop:
 	beq s1,s3,endMovingOptionsOutterLoop
-runMovingOptionsInnerLoop:
+paintMovingOptionsInnerLoop:
 	beq s0,s2,endMovingOptionsInnerLoop
 
 	li t0,0
@@ -618,12 +795,12 @@ runMovingOptionsInnerLoop:
 	
 skipHighlightThisSquare:
 	addi s0,s0,1
-	j runMovingOptionsInnerLoop
+	j paintMovingOptionsInnerLoop
 	
 endMovingOptionsInnerLoop:
 	addi s1,s1,1
 	addi s0,s9,-5
-	j runMovingOptionsOutterLoop
+	j paintMovingOptionsOutterLoop
 endMovingOptionsOutterLoop:
 	lw ra,0(sp)
 	lw s0,4(sp)
@@ -631,6 +808,72 @@ endMovingOptionsOutterLoop:
 	lw s2,12(sp)
 	lw s3,16(sp)
 	
+	ret
+
+	
+resetMovingOptions:	#a posicao do cursor estah em (s0,s1)
+
+	addi sp,sp,-28		#colocar coisas na pilha
+	sw ra,0(sp)
+	sw s0,4(sp)
+	sw s1,8(sp)
+	sw s2,12(sp)
+	sw s3,16(sp)
+	sw s4,20(sp)
+	sw s5,24(sp)
+	
+	addi s4,s0,-5   #	
+	addi s5,s1,-5	# posicao do canto esquerdo do quadrado que deve ser pintado
+	
+	addi s2,s4,12	#condicoes de parada
+	addi s3,s5,12	
+	
+resetMovingOptionsOutterLoop:
+	beq s5,s3,endResetMovingOptionsOutterLoop
+resetMovingOptionsInnerLoop:
+	beq s4,s2,endResetOptionsInnerLoop
+
+	li t0,0
+	blt s4,t0,skipResetThisSquare
+	blt s5,t0,skipResetThisSquare
+	li t0,20
+	bge s4,t0,skipResetThisSquare	#checam se o quadrado em questao esta dentro do bitmap
+	li t0,15
+	bge s5,t0,endResetOptionsInnerLoop
+	
+	mv a0,s4
+	mv a1,s5
+	mv a2,s0
+	mv a3,s1
+	jal getManhathamDistance
+	li t0,5
+	bgt a0,t0,skipResetThisSquare
+	
+	mv a0,s4
+	mv a1,s5
+	jal getTile
+	
+	slli a1,s4,4		#pinta o quadrado correspondente
+	slli a2,s5,4
+	lw a3,frame_zero
+	jal drawImage		
+	
+skipResetThisSquare:
+	addi s4,s4,1
+	j resetMovingOptionsInnerLoop
+	
+endResetOptionsInnerLoop:
+	addi s5,s5,1
+	addi s4,s4,-5
+	j resetMovingOptionsOutterLoop
+endResetMovingOptionsOutterLoop:
+	lw ra,0(sp)
+	lw s0,4(sp)
+	lw s1,8(sp)
+	lw s2,12(sp)
+	lw s3,16(sp)
+	lw s4,20(sp)
+	lw s5,24(sp)
 	ret
 	
 getTileCode:	# recebe em (a0,a1)=(x,y) a posicao do quadrado, retorna em a0 o codigo do tile	
