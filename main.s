@@ -120,6 +120,7 @@ changeTurn:
 pickCharacter:
 	addi sp,sp,-4
 	sw ra,0(sp)
+	j paintCursor
 pickCharacterLoop:
 	jal readKeyBlocking
 	
