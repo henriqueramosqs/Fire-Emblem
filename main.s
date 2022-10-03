@@ -209,6 +209,9 @@ characterPicked:
 	ret		#caso tiver, retorna
 	
 changePosition:
+	addi sp,sp,-4
+	sw ra,0(sp)
+	
 	mv s0,s9		#s0 e s1 serao cursores auxiliares
 	mv s1,s10
 changePositionLoop:
@@ -354,13 +357,18 @@ finishNextMovementPosition:
 	jal paintBorder
 	j changePositionLoop
 confirmChangePosition:
-	jal resetMovingOptions
+	jal resetMovingOptions		#tira os destaques do mapa
+	jal getCharacterByCoordinate	#muda posicao do personagem no arquivo
+	sb s0,0(a0)
+	sb s1,1(a0)
 	
 	mv s9,s0
 	mv s10,s1
-	
+	mv a0,s11
 	jal printAllCharacters
 	
+	lw ra,0(sp)
+	addi sp,sp,4
 	ret
 	
 	
@@ -430,7 +438,7 @@ resetHighlightedMapPosition: 	#reseta tile em destaque do mapa na posicao a0,a1
 	
 	lw ra,0(sp)
 	lw s1,4(sp)
-	addi sp,sp,4
+	addi sp,sp,8
 	ret
 	
 runOptionsMenu:
@@ -807,64 +815,62 @@ endMovingOptionsOutterLoop:
 	lw s1,8(sp)
 	lw s2,12(sp)
 	lw s3,16(sp)
+	addi sp,sp,20
 	
 	ret
+resetMovingOptions:	#a posicao do cursor estah em (s9,s10)
 
-	
-resetMovingOptions:	#a posicao do cursor estah em (s0,s1)
-
-	addi sp,sp,-28		#colocar coisas na pilha
+	addi sp,sp,-20		#colocar coisas na pilha
 	sw ra,0(sp)
 	sw s0,4(sp)
 	sw s1,8(sp)
 	sw s2,12(sp)
 	sw s3,16(sp)
-	sw s4,20(sp)
-	sw s5,24(sp)
 	
-	addi s4,s0,-5   #	
-	addi s5,s1,-5	# posicao do canto esquerdo do quadrado que deve ser pintado
+	addi s0,s9,-5   #	
+	addi s1,s10,-5	# posicao do canto esquerdo do quadrado que deve ser pintado
 	
-	addi s2,s4,12	#condicoes de parada
-	addi s3,s5,12	
+	addi s2,s0,12	#condicoes de parada
+	addi s3,s1,12	
 	
 resetMovingOptionsOutterLoop:
-	beq s5,s3,endResetMovingOptionsOutterLoop
+	beq s1,s3,endResetMovingOptionsOutterLoop
 resetMovingOptionsInnerLoop:
-	beq s4,s2,endResetOptionsInnerLoop
+	beq s0,s2,endResetMovingOptionsInnerLoop
 
 	li t0,0
-	blt s4,t0,skipResetThisSquare
-	blt s5,t0,skipResetThisSquare
+	blt s0,t0,skipResetThisSquare
+	blt s1,t0,skipResetThisSquare
 	li t0,20
-	bge s4,t0,skipResetThisSquare	#checam se o quadrado em questao esta dentro do bitmap
+	bge s0,t0,skipResetThisSquare	#checam se o quadrado em questao esta dentro do bitmap
 	li t0,15
-	bge s5,t0,endResetOptionsInnerLoop
+	bge s1,t0,endResetMovingOptionsInnerLoop
 	
-	mv a0,s4
-	mv a1,s5
-	mv a2,s0
-	mv a3,s1
+	mv a0,s0
+	mv a1,s1
+	mv a2,s9
+	mv a3,s10
 	jal getManhathamDistance
 	li t0,5
 	bgt a0,t0,skipResetThisSquare
 	
-	mv a0,s4
-	mv a1,s5
+	mv a0,s0
+	mv a1,s1
+	jal getTileCode
 	jal getTile
 	
-	slli a1,s4,4		#pinta o quadrado correspondente
-	slli a2,s5,4
+	slli a1,s0,4		#pinta o quadrado correspondente
+	slli a2,s1,4
 	lw a3,frame_zero
 	jal drawImage		
 	
 skipResetThisSquare:
-	addi s4,s4,1
+	addi s0,s0,1
 	j resetMovingOptionsInnerLoop
 	
-endResetOptionsInnerLoop:
-	addi s5,s5,1
-	addi s4,s4,-5
+endResetMovingOptionsInnerLoop:
+	addi s1,s1,1
+	addi s0,s9,-5
 	j resetMovingOptionsOutterLoop
 endResetMovingOptionsOutterLoop:
 	lw ra,0(sp)
@@ -872,9 +878,9 @@ endResetMovingOptionsOutterLoop:
 	lw s1,8(sp)
 	lw s2,12(sp)
 	lw s3,16(sp)
-	lw s4,20(sp)
-	lw s5,24(sp)
+	addi sp,sp,20
 	ret
+
 	
 getTileCode:	# recebe em (a0,a1)=(x,y) a posicao do quadrado, retorna em a0 o codigo do tile	
 	li t0,20
