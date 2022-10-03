@@ -362,6 +362,9 @@ confirmChangePosition:
 	sb s0,0(a0)
 	sb s1,1(a0)
 	
+	
+	#jal animateMovement	
+	
 	mv s9,s0
 	mv s10,s1
 	mv a0,s11
@@ -371,7 +374,8 @@ confirmChangePosition:
 	addi sp,sp,4
 	ret
 	
-	
+animateMovement: 	#recebe em a0, o codigo do personagem, (a1,a2)= (orig_x,orig_y); (a3,a4)= (dest_x,dest_y)
+
 paintBorder: 	#recebe em (a0,a1) a posicao do mapa e pinta borda lá
 	
 	addi sp,sp,-4
@@ -550,6 +554,9 @@ FinishLeftMenu:
 	li a0,0
 	jal resetOptionsMenu
 	
+	mv a0,s11
+	jal printAllCharacters
+	
 	lw ra,0(sp)
 	addi sp,sp,4
 	
@@ -645,6 +652,9 @@ rightMenuChosen:
 FinishRightMenu:
 	li a0,1
 	jal resetOptionsMenu
+	
+	mv a0,s11
+	jal printAllCharacters
 	
 	lw ra,0(sp)
 	addi sp,sp,4
@@ -1120,6 +1130,9 @@ printCharactersLoop:
 	slli t0,s1,2 	
 	add t0,t0,s0 	#t0 aponta para a linha de descricao do s1-esimo character
 	
+	lb a1,2(t0)
+	ble a1,zero,nextPrintCharactersIteration
+	
 	lb a1,(t0)
 	slli a1,a1,4	#a1 = pos_x em pixels do personagem
 	
@@ -1136,6 +1149,7 @@ printCharactersLoop:
 	lw a0,4(sp)
 	addi sp,sp,8	
 	
+nextPrintCharactersIteration:	
 	addi s1,s1,1
 	j printCharactersLoop
 endPrintCharacters:	
