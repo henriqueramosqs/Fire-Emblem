@@ -406,19 +406,32 @@ paintBorder: 	#recebe em (a0,a1) a posicao do mapa e pinta borda lá
 	ret
 	
 	
-resetMapPosition: 	#reseta tile do mapa na posicao a0,a1
-	addi sp,sp,-4
+resetMapPosition: 	#reseta tile do mapa na posicao (a0,a1) =(x,y)
+	addi sp,sp,-24
 	sw ra,0(sp)
+	sw a0,4(sp)
+	sw a1,8(sp)
+	sw a2,12(sp)
+	sw a3,16(sp)
+	sw s0,20(sp)
 	
+	mv s0,a0
 	jal getTileCode
 	jal getTile	
-	slli a1,s9,4
-	slli a2,s10,4
+	
+	slli a2,a1,4
+	slli a1,s0,4
+
 	lw a3,frame_zero
 	jal drawImage
 	
 	lw ra,0(sp)
-	addi sp,sp,4
+	lw a0,4(sp)
+	lw a1,8(sp)
+	lw a2,12(sp)
+	lw a3,16(sp)
+	lw s0,20(sp)
+	addi sp,sp,24
 	ret
 	
 resetHighlightedMapPosition: 	#reseta tile em destaque do mapa na posicao a0,a1
@@ -445,11 +458,11 @@ runOptionsMenu:
 	addi sp,sp,-4
 	sw ra,0(sp)
 	
-	li t0,1
-	li t1, 0xFF200604 
-	sb t0,0(t1)	# troca de frame
+	#li t0,1
+	#li t1, 0xFF200604 
+	#sb t0,0(t1)	# troca de frame
 	
-	lw a5,frame_one	# prepara para chamada de procedimento de drawSquare
+	lw a5,frame_zero	# prepara para chamada de procedimento de drawSquare
 	
 	li t2,10
 	blt s9,t2,rightSideMenu
@@ -534,6 +547,8 @@ LeftMenuChosen:
 	j LeftMenuLoop
 	
 FinishLeftMenu:
+	li a0,0
+	jal resetOptionsMenu
 	
 	lw ra,0(sp)
 	addi sp,sp,4
@@ -544,7 +559,7 @@ OpenLeftWeaponChoice:
 	li a0,0	# marca que deves-se usar o lado direito
 	jal OpenWeaponChoice
 	
-	j LeftMenuLoop
+	j LeftMenuLoop 
 
 	ret
 	
@@ -628,12 +643,57 @@ rightMenuChosen:
 	j rightMenuLoop
 	
 FinishRightMenu:
+	li a0,1
+	jal resetOptionsMenu
 	
 	lw ra,0(sp)
 	addi sp,sp,4
 	
 	ret
 	
+resetOptionsMenu:	#recebe em a0 lado da barrea de menu -> 0 para esquerda, 1 para direita
+	addi sp,sp,-20
+	sw ra,0(sp)
+	sw s0,4(sp)
+	sw s1,8(sp)
+	sw s2,12(sp)
+	sw s3,16(sp)
+	
+	li s1,1
+	li s3,8
+	
+	bne a0,s1,leftSideResetOptions
+	li s0,13	#atualiza os marcadores
+	li s2,19
+	j resetOptionsMenuOutterLoop
+leftSideResetOptions:	
+	li s0,1
+	li s2,8
+resetOptionsMenuOutterLoop:
+	beq s1,s3,endResetOptionsMenuOutterLoop
+	
+resetOptionsMenuInnerLoop:
+	beq s0,s2,endResetOptionsMenuInnerLoop
+	mv a0,s0
+	mv a1,s1
+	jal resetMapPosition
+	addi s0,s0,1
+	j resetOptionsMenuInnerLoop
+	
+endResetOptionsMenuInnerLoop:
+	addi s0,s0,-7
+	addi s1,s1,1
+	j resetOptionsMenuOutterLoop
+	
+endResetOptionsMenuOutterLoop:
+	lw ra,0(sp)
+	lw s0,4(sp)
+	lw s1,8(sp)
+	lw s2,12(sp)
+	lw s3,16(sp)
+	addi sp,sp,20
+	
+	ret
 OpenRightWeaponChoice:
 
 	
@@ -676,7 +736,7 @@ OpenWeaponChoice:	#recebe em a0 lado da barrea de menu -> 0 para esquerda, 1 par
 
 	mv a0,s0
 	jal getWeaponImage	 		#oega sprite da arma 
-	lw a3,frame_one 	#desenha arma do persoagem
+	lw a3,frame_zero 	#desenha arma do persoagem
 	
 	jal drawImage
 	
@@ -747,7 +807,7 @@ weaponChosen:
 	addi a2,a2,-2
 	li a3,20
 	li a4,20		# apaga imagem da arma
-	lw a5,frame_one
+	lw a5,frame_zero
 	jal drawSquare
 	
 	lw ra,0(sp)
@@ -1100,7 +1160,7 @@ drawLeftSideMenuOptions:	# :void,recebe em a0 indice da escolha
 	la a0, atacar
 	li a1,22
 	li a2,22		# adiciona as informacoes de de print do primeiro item da lista(excessao da cor)
-	li a4,1	
+	li a4,0
 	
 	bne s1,t0,FirstLeftOptionOpaque
 	li a3,39935	#cor caso a primeira opcao  esteja selecionada
@@ -1155,7 +1215,7 @@ drawRightSideMenuOptions:	# :void,recebe em a0 indice da escolha
 	la a0, atacar
 	li a1,219
 	li a2,22		# adiciona as informacoes de de print do primeiro item da lista(excessao da cor)
-	li a4,1	
+	li a4,0
 	
 	bne s1,t0,FirstRightOptionOpaque
 	li a3,39935	#cor caso a primeira opcao  esteja selecionada
