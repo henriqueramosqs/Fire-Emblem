@@ -109,7 +109,7 @@
 	lw a5,frame_one
 	jal drawSquare
 	
-	li a0,5
+	li a0,3
 StartLevel:	#recebe em a0 o número da fase, efetua os proicedimentos necessários
 		
 		#<procedimento_de_rodar_história>
@@ -413,9 +413,6 @@ enhanceFullHeart:
 	jal getCharacterByCoordinate
 	li t0,15	#sample
 	sb t0,2(a0)
-	lb a0,2(a0)
-	li a7,1
-	ecall
 	
 	j finishConfirmChangePosition
 	
@@ -424,10 +421,6 @@ enhanceHalfHeart:
 	lb t0,2(a0)
 	addi t0,t0,3
 	sb t0,2(a0)
-	
-	lb a0,2(a0)
-	li a7,1
-	ecall
 	
 	j finishConfirmChangePosition
 	
@@ -1351,6 +1344,8 @@ printAllCharacters:	#recebe em a0 o numero da fase, printa todos correrspondente
 	lw a2,frame_zero	# printa aliados
 	jal printCharacters
 	
+	beq a0,zero,restartLevel
+	
 	lw a0,0(sp)
 	jal getEnemies
 	
@@ -1360,16 +1355,62 @@ printAllCharacters:	#recebe em a0 o numero da fase, printa todos correrspondente
 	lw a2,frame_zero	# printa inimigos
 	jal printCharacters
 	
+	beq a0,zero,nextLevel
+	
 	lw ra,4(sp)
 	addi sp,sp,8
 	ret
 
-printCharacters:	# recebe em a0 o arquivo de allies/enemies, em a1 endereço do sprite, em a2 o endereco da frame
+restartLevel:	
+	jal resetAllLives	#restarta a vida de todos
+	
+	mv a0,s11
+	jal StartLevel
+
+nextLevel:
+	addi a0,s11,1		
+	jal StartLevel		#pula de fase
+	
+resetAllLives:	
+	lb t3,0(s8) 	#s0 = (qtd de inimigos)
+	addi t2,s8,1	#s2 = endereco base dos inimigos
+	li t1,0
+resetEnemieslives.loop:
+	beq t1,t3,resetAlliesLives	
+	li t0,10 	#sample
+	
+	sb t0,2(t2)
+	
+	addi t2,t2,4
+	addi t1,t1,1
+	j resetEnemieslives.loop
+	
+resetAlliesLives:	
+	lb t3,0(s7) 	#s0 = (qtd de inimigos)
+	addi t2,s7,1	#s2 = endereco base dos inimigos
+	li t1,0
+	
+resetAllieslives.loop:
+	beq t1,t3,endResetLives	
+	li t0,10 	#sample
+	
+	sb t0,2(t2)
+	
+	addi t2,t2,4
+	addi t1,t1,1
+	j resetAllieslives.loop
+endResetLives:
+	ret	
+		
+	
+
+printCharacters:	# recebe em a0 o arquivo de allies/enemies, em a1 endereço do sprite, em a2 o endereco da frame, retorna em a0 a quantidade que foi printado
 	addi sp,sp,-12			#sobrescreve s0,s1,s2 (colocar na pilha)
 	sw s0,0(sp)	
 	sw s1,4(sp)
 	sw s2,8(sp)
-				
+					
+	li s3,0		#contador de personagens printados
 	mv s0,a0  	# s0 contém enreco base do arquivo de character
 	mv a3,a2 	#preparam para chamada da funcao DrawImage
 	mv a0,a1
@@ -1385,7 +1426,9 @@ printCharactersLoop:
 	add t0,t0,s0 	#t0 aponta para a linha de descricao do s1-esimo character
 	
 	lb a1,2(t0)
-	ble a1,zero,nextPrintCharactersIteration
+	ble a1,zero,nextPrintCharactersIteration	#se nao tiver vida,nao printa
+	
+	addi s3,s3,1
 	
 	lb a1,(t0)
 	slli a1,a1,4	#a1 = pos_x em pixels do personagem
@@ -1407,6 +1450,7 @@ nextPrintCharactersIteration:
 	addi s1,s1,1
 	j printCharactersLoop
 endPrintCharacters:	
+	mv a0,s3
 	lw s0,0(sp)	
 	lw s1,4(sp)
 	lw s2,8(sp)
