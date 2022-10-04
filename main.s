@@ -387,7 +387,7 @@ confirmChangePosition:
 	ret
 	
 animateMovement: 	#recebe em a0 o codigo do personagem(0=heroi,1=inimigo), (a1,a2)= (orig_x,orig_y); (a3,a4)= (dest_x,dest_y)
-	addi sp,sp,-28
+	addi sp,sp,-32
 	sw a0,0(sp)
 	sw ra,4(sp)
 	sw s0,8(sp)
@@ -395,7 +395,8 @@ animateMovement: 	#recebe em a0 o codigo do personagem(0=heroi,1=inimigo), (a1,a
 	sw s2,16(sp)
 	sw s3,20(sp)
 	sw s4,24(sp)
-	
+	sw s6,28(sp)
+		
 	mv s1,a1	#colocar coisas na pilha
 	mv s2,a2
 	mv s3,a3
@@ -504,7 +505,8 @@ endAnimateMovement:
 	lw s2,16(sp)
 	lw s3,20(sp)
 	lw s4,24(sp)
-	addi sp,sp,28
+	lw s6,28(sp)
+	addi sp,sp,32
 	ret
 
 pickMovingCharacter:	#recebe em a0 o codigo do personagem(0=heroi,1=inimigo), em a1 adirecao(0=up,1=dir,2=down,3=left), retorna em a0 a sprite
