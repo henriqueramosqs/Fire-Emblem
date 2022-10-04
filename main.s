@@ -6,6 +6,12 @@
 	.include "images_data/Grass.data"
 	.include "images_data/HighlightedGrass.data"
 	
+	.include "images_data/FullHeart.data"
+	.include "images_data/HighlightedFullHeart.data"
+	
+	.include "images_data/HalfHeart.data"
+	.include "images_data/HighlightedHalfHeart.data"
+	
 	#mapas
 	.include "maps/Mapa_fase1.data"
 	.include "maps/Mapa_fase2.data"
@@ -393,6 +399,39 @@ confirmChangePosition:
 	
 	mv s9,s0
 	mv s10,s1
+	
+	mv a0,s9	#se parou em fullHeart ou Halfheart, aumenta vida 
+	mv a1,s10
+	jal getTileCode	
+	li t0,3
+	beq a0,t0,enhanceFullHeart
+	li t0,4
+	beq a0,t0,enhanceHalfHeart
+	j finishConfirmChangePosition
+	
+enhanceFullHeart:
+	jal getCharacterByCoordinate
+	li t0,15	#sample
+	sb t0,2(a0)
+	lb a0,2(a0)
+	li a7,1
+	ecall
+	
+	j finishConfirmChangePosition
+	
+enhanceHalfHeart:
+	jal getCharacterByCoordinate
+	lb t0,2(a0)
+	addi t0,t0,3
+	sb t0,2(a0)
+	
+	lb a0,2(a0)
+	li a7,1
+	ecall
+	
+	j finishConfirmChangePosition
+	
+finishConfirmChangePosition:
 	mv a0,s11
 	jal printAllCharacters
 	
@@ -1173,6 +1212,12 @@ getHighlightedTile:	#recebe em (a0,a1)=(x,y) a posicao do quadrado, retorna o en
 	
 	li t0,2
 	beq a0,t0,getHighlightedBush
+
+	li t0,3
+	beq a0,t0,getHighlightedFullHeart
+	
+	li t0,4
+	beq a0,t0,getHighlightedHalfHeart
 	
 	li a0,-1
 	ret
@@ -1182,6 +1227,12 @@ getHighlightedGrass:
 	j endGetHighlightedTile
 getHighlightedBush:
 	la a0,HighlightedBush	
+	j endGetHighlightedTile
+getHighlightedFullHeart:
+	la a0,HighlightedFullHeart
+	j endGetHighlightedTile
+getHighlightedHalfHeart:
+	la a0,HighlightedHalfHeart	
 	j endGetHighlightedTile
 endGetHighlightedTile:
 	lw ra,0(sp)
@@ -1623,6 +1674,10 @@ getTile: #recebe em a0 o código do tile, retorna em a0 o endereço do tile ou -
 	beq a0,t0,grassTile
 	addi t0,t0,1
 	beq a0,t0,bushTile
+	addi t0,t0,1
+	beq a0,t0,FullHeartTile
+	addi t0,t0,1
+	beq a0,t0,HalfHeartTile
 	li a0,-1
 	ret
 grassTile:
@@ -1631,7 +1686,12 @@ grassTile:
 bushTile:
 	la a0,Bush
 	ret
-	
+FullHeartTile:
+	la a0,FullHeart
+	ret
+HalfHeartTile:
+	la a0,HalfHeart
+	ret
 
 
 
