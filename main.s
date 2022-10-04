@@ -115,8 +115,8 @@ GameLoop:
 UserTurn:
 	jal pickCharacter
 	jal paintMovingOptions
-	mv a0,s11
-	jal printAllCharacters
+#	mv a0,s11
+#	jal printAllCharacters
 	jal changePosition
 	jal runOptionsMenu	# a abre o menu de opcoes
 changeTurn:	
