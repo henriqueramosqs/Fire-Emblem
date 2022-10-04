@@ -18,7 +18,15 @@
 	#sprites
 	.include "images_data/Hero.data"
 	.include "images_data/Enemy.data"
-	
+	.include "images_data/Hero_up.data"
+	.include "images_data/Enemy_up.data"
+	.include "images_data/Hero_down.data"
+	.include "images_data/Enemy_down.data"
+	.include "images_data/Hero_left.data"
+	.include "images_data/Enemy_left.data"
+	.include "images_data/Hero_right.data"
+	.include "images_data/Enemy_right.data"
+		
 	#others
 	.include "images_data/computer.data"
 	.include "images_data/calculator.data"
@@ -110,7 +118,7 @@ UserTurn:
 	mv a0,s11
 	jal printAllCharacters
 	jal changePosition
-	jal runOptionsMenu	#a abre o menu de opcoes
+	jal runOptionsMenu	# a abre o menu de opcoes
 changeTurn:	
 	xori s6,s6,1
 	j GameLoop
@@ -362,8 +370,12 @@ confirmChangePosition:
 	sb s0,0(a0)
 	sb s1,1(a0)
 	
-	
-	#jal animateMovement	
+	li a0,0
+	mv a1,s9
+	mv a2,s10
+	mv a3,s0
+	mv a4,s1
+	jal animateMovement	
 	
 	mv s9,s0
 	mv s10,s1
@@ -374,8 +386,180 @@ confirmChangePosition:
 	addi sp,sp,4
 	ret
 	
-animateMovement: 	#recebe em a0, o codigo do personagem, (a1,a2)= (orig_x,orig_y); (a3,a4)= (dest_x,dest_y)
+animateMovement: 	#recebe em a0 o codigo do personagem(0=heroi,1=inimigo), (a1,a2)= (orig_x,orig_y); (a3,a4)= (dest_x,dest_y)
+	addi sp,sp,-28
+	sw a0,0(sp)
+	sw ra,4(sp)
+	sw s0,8(sp)
+	sw s1,12(sp)
+	sw s2,16(sp)
+	sw s3,20(sp)
+	sw s4,24(sp)
+	
+	mv s1,a1	#colocar coisas na pilha
+	mv s2,a2
+	mv s3,a3
+	mv s4,a4		
+	
+	bgt a1,a3,moveToLeft
+	bgt a3,a1,moveToRight
+	j checkHorizontally
+moveToRight:
+	li a1,1
+	jal pickMovingCharacter
+	mv s6,a0	#s6 vai conter o endereco da imagem do personaem
+	mv s0,s1	#s0 vai marcar posicao atual
+moveToRight.loop:
+	beq s0,s3,checkHorizontally
+	mv a0,s0
+	mv a1,s2
+	jal resetMapPosition
+	
+	addi s0,s0,1
+	mv a0,s6
+	slli a1,s0,4	
+	slli a2,s2,4
+	lw a3,frame_zero
+		
+	jal drawImage	#Printa personagem
+	j moveToRight.loop
+	
+moveToLeft:
+	li a1,3
+	jal pickMovingCharacter
+	mv s6,a0	#s6 vai conter o endereco da imagem do personaem
+	mv s0,s1	#s0 vai marcar posicao atual
+moveToLeft.loop:
+	beq s0,s3,checkHorizontally
+	mv a0,s0
+	mv a1,s2
+	jal resetMapPosition
+	
+	addi s0,s0,-1
+	mv a0,s6
+	slli a1,s0,4	
+	slli a2,s2,4
+	lw a3,frame_zero
+		
+	jal drawImage	#Printa personagem
+	j moveToLeft.loop
+	
+checkHorizontally:
+	mv s1,s3
+	bgt s2,s4,moveUpwards
+	bgt s4,s2,moveDownwards
+	j endAnimateMovement
+	
+moveUpwards:
+	li a1,0
+	lw a0,0(sp)
+	jal pickMovingCharacter
+	mv s6,a0	#s6 vai conter o endereco da imagem do personaem
+	mv s0,s2	#s0 vai marcar posicao atual
+moveUpwards.loop:
+	beq s0,s4,endAnimateMovement
+	mv a0,s1
+	mv a1,s0
+	jal resetMapPosition
+	
+	addi s0,s0,-1
+	mv a0,s6
+	slli a1,s3,4	
+	slli a2,s0,4
+	lw a3,frame_zero
+		
+	jal drawImage	#Printa personagem
+	j moveUpwards.loop
+	
+moveDownwards:
+	li a1,2
+	lw a0,0(sp)
+	jal pickMovingCharacter
+	mv s6,a0	#s6 vai conter o endereco da imagem do personaem
+	mv s0,s2	#s0 vai marcar posicao atual
+moveDownwards.loop:
+	beq s0,s4,endAnimateMovement
+	mv a0,s1
+	mv a1,s0
+	jal resetMapPosition
+	
+	addi s0,s0,+1
+	mv a0,s6
+	slli a1,s3,4	
+	slli a2,s0,4
+	lw a3,frame_zero
+		
+	jal drawImage	#Printa personagem
+	j moveDownwards.loop
+	
+endAnimateMovement:
+	mv a0,s3
+	mv a1,s4
+	jal resetMapPosition
+	
+	lw a0,0(sp)
+	lw ra,4(sp)
+	lw s0,8(sp)
+	lw s1,12(sp)
+	lw s2,16(sp)
+	lw s3,20(sp)
+	lw s4,24(sp)
+	addi sp,sp,28
+	ret
 
+pickMovingCharacter:	#recebe em a0 o codigo do personagem(0=heroi,1=inimigo), em a1 adirecao(0=up,1=dir,2=down,3=left), retorna em a0 a sprite
+	beq a0,zero, pickMovingHero
+	li t0,1
+	beq a0,t0, pickMovingEnemy
+	li a0,-1
+	ret
+	
+pickMovingHero:
+	beq a1,zero,pickUpHero
+	li t0,1
+	beq a1,t0,pickRightHero
+	li t0,2
+	beq a1,t0,pickDownHero
+	li t0,3
+	beq a1,t0,pickLeftHero
+	li a0,-1
+	ret
+pickUpHero:
+	la a0,Hero_up
+	ret
+pickRightHero:
+	la a0,Hero_right
+	ret
+pickDownHero:
+	la a0,Hero_down
+	ret
+pickLeftHero:
+	la a0,Hero_left
+	ret
+	
+pickMovingEnemy:
+	beq a1,zero,pickUpEnemy
+	li t0,1
+	beq a1,t0,pickRightEnemy
+	li t0,2
+	beq a1,t0,pickDownEnemy
+	li t0,3
+	beq a1,t0,pickLeftEnemy
+	li a0,-1
+	ret
+pickUpEnemy:
+	la a0,Enemy_up
+	ret
+pickRightEnemy:
+	la a0,Enemy_right
+	ret
+pickDownEnemy:
+	la a0,Enemy_down
+	ret
+pickLeftEnemy:
+	la a0,Enemy_left
+	ret
+	
 paintBorder: 	#recebe em (a0,a1) a posicao do mapa e pinta borda lá
 	
 	addi sp,sp,-4
@@ -880,6 +1064,9 @@ endMovingOptionsInnerLoop:
 	addi s0,s9,-5
 	j paintMovingOptionsOutterLoop
 endMovingOptionsOutterLoop:
+
+	mv a0,s11
+	jal printAllCharacters 
 	lw ra,0(sp)
 	lw s0,4(sp)
 	lw s1,8(sp)

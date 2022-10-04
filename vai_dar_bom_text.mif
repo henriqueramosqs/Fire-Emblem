@@ -1,0 +1,1102 @@
+DEPTH = 16384;
+WIDTH = 32;
+ADDRESS_RADIX = HEX;
+DATA_RADIX = HEX;
+CONTENT
+BEGIN
+00000000 : 00000513;   % 72: 	li a0, 0 %
+00000001 : 14000693;   % 73: 	li a3,320 %
+00000002 : 0f000713;   % 74: 	li a4 240 %
+00000003 : 0fc11797;   % 75: 	lw a5,frame_one %
+00000004 : a807a783;   % 75:  %
+00000005 : 775000ef;   % 76: 	jal drawSquare %
+00000006 : 0c700513;   % 78: 	li a0, 0xc7 %
+00000007 : 14000693;   % 79: 	li a3,320 %
+00000008 : 0f000713;   % 80: 	li a4 240 %
+00000009 : 0fc11797;   % 81: 	lw a5,frame_one %
+0000000a : a687a783;   % 81:  %
+0000000b : 75d000ef;   % 82: 	jal drawSquare %
+0000000c : 00100513;   % 84: 	li a0,1 %
+0000000d : 00a00db3;   % 89: 	mv s11, a0 	# s11 armazena qual a fase %
+0000000e : 00a00c93;   % 90: 	li s9,10		# s9 e s10 serao usados para marcar a posicao do cursos (coord_x e coord_y respectivamente) %
+0000000f : 00700d13;   % 91: 	li s10,7 %
+00000010 : 00000b13;   % 92: 	li s6,0		#s6 marca de quem eh o turno %
+00000011 : 595000ef;   % 94: 	jal getLevelMap %
+00000012 : 00a00ab3;   % 95: 	mv s5,a0	#s5 armazena endereco do mapa da fase  %
+00000013 : 0fc11597;   % 97: 	lw a1, frame_zero %
+00000014 : a3c5a583;   % 97:  %
+00000015 : 5d1000ef;   % 98: 	jal printMap	 %
+00000016 : 01b00533;   % 100: 	mv a0,s11 %
+00000017 : 28d000ef;   % 101: 	jal printAllCharacters %
+00000018 : 000b0463;   % 104: 	beq s6,zero,UserTurn %
+00000019 : 01c0006f;   % 106: 	j changeTurn %
+0000001a : 028000ef;   % 108: 	jal pickCharacter %
+0000001b : 7b8000ef;   % 109: 	jal paintMovingOptions %
+0000001c : 01b00533;   % 110: 	mv a0,s11 %
+0000001d : 275000ef;   % 111: 	jal printAllCharacters %
+0000001e : 110000ef;   % 112: 	jal changePosition %
+0000001f : 3e0000ef;   % 113: 	jal runOptionsMenu	#a abre o menu de opcoes %
+00000020 : 001b4b13;   % 115: 	xori s6,s6,1 %
+00000021 : fddff06f;   % 116: 	j GameLoop %
+00000022 : 00a00893;   % 118: 	li a7,10	#finaliza %
+00000023 : 00000073;   % 119: 	ecall %
+00000024 : ffc10113;   % 122: 	addi sp,sp,-4 %
+00000025 : 00112023;   % 123: 	sw ra,0(sp) %
+00000026 : 0c00006f;   % 124: 	j paintCursor %
+00000027 : 635000ef;   % 126: 	jal readKeyBlocking %
+00000028 : 07700293;   % 128: 	li t0,'w' %
+00000029 : 02550463;   % 129: 	beq a0,t0, moveCursorUp %
+0000002a : 06100293;   % 131: 	li t0,'a' %
+0000002b : 04550663;   % 132: 	beq a0,t0, moveCursorLeft %
+0000002c : 07300293;   % 134: 	li t0,'s' %
+0000002d : 08550663;   % 135: 	beq a0,t0, moveCursorDown %
+0000002e : 06400293;   % 137: 	li t0,'d' %
+0000002f : 06550463;   % 138: 	beq a0,t0, moveCursorRight %
+00000030 : 02000293;   % 140: 	li t0,' ' %
+00000031 : 0a550663;   % 141: 	beq a0,t0,characterPicked %
+00000032 : fd5ff06f;   % 143: 	j pickCharacterLoop %
+00000033 : 01900533;   % 145: 	mv a0,s9		#pinta posicao anterior %
+00000034 : 01a005b3;   % 146: 	mv a1,s10 %
+00000035 : 2f4000ef;   % 147: 	jal resetMapPosition %
+00000036 : 00000293;   % 149: 	li t0,0				#faz os calculos da posicao do cursor %
+00000037 : 01a2d663;   % 150: 	ble s10,t0,donnutUp %
+00000038 : fffd0d13;   % 151: 	addi s10,s10,-1 %
+00000039 : 0080006f;   % 152: 	j finishMoveCursorUp %
+0000003a : 00ed0d13;   % 154: 	addi s10,s10,14	 %
+0000003b : 00f00293;   % 156: 	li t0,15 %
+0000003c : 025d6d33;   % 157: 	rem s10,s10,t0 %
+0000003d : 0640006f;   % 158: 	j paintCursor %
+0000003e : 01900533;   % 161: 	mv a0,s9		#pinta posicao anterior %
+0000003f : 01a005b3;   % 162: 	mv a1,s10 %
+00000040 : 2c8000ef;   % 163: 	jal resetMapPosition %
+00000041 : 00000293;   % 165: 	li t0,0				#faz os calculos da posicao do cursor %
+00000042 : 0192d663;   % 166: 	ble s9,t0,donnutLeft %
+00000043 : fffc8c93;   % 167: 	addi s9,s9,-1 %
+00000044 : 0080006f;   % 168: 	j finishMoveCursorLeft %
+00000045 : 013c8c93;   % 170: 	addi s9,s9,19 %
+00000046 : 01400293;   % 172: 	li t0,20 %
+00000047 : 025cecb3;   % 173: 	rem s9,s9,t0 %
+00000048 : 0380006f;   % 174: 	j paintCursor %
+00000049 : 01900533;   % 177: 	mv a0,s9		#pinta posicao anterior %
+0000004a : 01a005b3;   % 178: 	mv a1,s10 %
+0000004b : 29c000ef;   % 179: 	jal resetMapPosition %
+0000004c : 001c8c93;   % 180: 	addi s9,s9,1 %
+0000004d : 01400293;   % 181: 	li t0,20 %
+0000004e : 025cecb3;   % 182: 	rem s9,s9,t0 %
+0000004f : 01c0006f;   % 183: 	j paintCursor %
+00000050 : 01900533;   % 185: 	mv a0,s9		#pinta posicao anterior %
+00000051 : 01a005b3;   % 186: 	mv a1,s10 %
+00000052 : 280000ef;   % 187: 	jal resetMapPosition %
+00000053 : 001d0d13;   % 188: 	addi s10,s10,1 %
+00000054 : 00f00293;   % 189: 	li t0,15 %
+00000055 : 025d6d33;   % 190: 	rem s10,s10,t0 %
+00000056 : 01900533;   % 192: 	mv a0,s9 %
+00000057 : 01a005b3;   % 193: 	mv a1,s10 %
+00000058 : 200000ef;   % 194: 	jal paintBorder %
+00000059 : 01b00533;   % 196: 	mv a0,s11 %
+0000005a : 181000ef;   % 197: 	jal printAllCharacters	#pinta os personagens de novo %
+0000005b : f31ff06f;   % 199: 	j pickCharacterLoop	 %
+0000005c : 141000ef;   % 203: 	jal getCharacterByCoordinate %
+0000005d : fff00293;   % 204: 	li t0,-1 %
+0000005e : f25502e3;   % 205: 	beq a0,t0,pickCharacterLoop	# se o espaco clicado nao tiver personagem, reitera o loop %
+0000005f : 00012083;   % 207: 	lw ra,0(sp) %
+00000060 : 00410113;   % 208: 	addi sp,sp,4 %
+00000061 : 00008067;   % 209: 	ret		#caso tiver, retorna %
+00000062 : ffc10113;   % 212: 	addi sp,sp,-4 %
+00000063 : 00112023;   % 213: 	sw ra,0(sp) %
+00000064 : 01900433;   % 215: 	mv s0,s9		#s0 e s1 serao cursores auxiliares %
+00000065 : 01a004b3;   % 216: 	mv s1,s10 %
+00000066 : 539000ef;   % 218: 	jal readKeyBlocking %
+00000067 : 07700293;   % 219: 	li t0,'w' %
+00000068 : 02550463;   % 220: 	beq a0,t0,changePositionUp %
+00000069 : 06100293;   % 222: 	li t0,'a' %
+0000006a : 12550463;   % 223: 	beq a0,t0,changePositionLeft %
+0000006b : 07300293;   % 225: 	li t0,'s' %
+0000006c : 06550863;   % 226: 	beq a0,t0,changePositionDown %
+0000006d : 06400293;   % 228: 	li t0,'d' %
+0000006e : 0c550063;   % 229: 	beq a0,t0,changePositionRight %
+0000006f : 02000293;   % 231: 	li t0,' ' %
+00000070 : 16550a63;   % 232: 	beq a0,t0,confirmChangePosition %
+00000071 : fd5ff06f;   % 234: 	j changePositionLoop %
+00000072 : 00800533;   % 237: 	mv a0,s0 %
+00000073 : 009005b3;   % 238: 	mv a1,s1 %
+00000074 : 254000ef;   % 239: 	jal resetHighlightedMapPosition %
+00000075 : 01b00533;   % 240: 	mv a0,s11 %
+00000076 : 111000ef;   % 241: 	jal printAllCharacters  %
+00000077 : fff48493;   % 243: 	addi s1,s1,-1 %
+00000078 : 00800533;   % 244: 	mv a0,s0 %
+00000079 : 009005b3;   % 245: 	mv a1,s1 %
+0000007a : 01900633;   % 246: 	mv a2,s9 %
+0000007b : 01a006b3;   % 247: 	mv a3,s10 %
+0000007c : 011000ef;   % 248: 	jal getManhathamDistance %
+0000007d : 00500293;   % 250: 	li t0,5 %
+0000007e : 00a2c463;   % 251: 	bgt a0,t0,DonnutMovingOptionsUp %
+0000007f : 1280006f;   % 252: 	j finishNextMovementPosition %
+00000080 : 00800533;   % 255: 	mv a0,s0 %
+00000081 : 00000593;   % 256: 	li a1,0 %
+00000082 : 01900633;   % 257: 	mv a2,s9 %
+00000083 : 00000693;   % 258: 	li a3,0 %
+00000084 : 7f0000ef;   % 259: 	jal getManhathamDistance %
+00000085 : 40ad04b3;   % 261: 	sub s1,s10,a0 %
+00000086 : 00548493;   % 262: 	addi s1,s1,5 %
+00000087 : 1080006f;   % 264: 	j finishNextMovementPosition %
+00000088 : 00800533;   % 267: 	mv a0,s0 %
+00000089 : 009005b3;   % 268: 	mv a1,s1 %
+0000008a : 1fc000ef;   % 269: 	jal resetHighlightedMapPosition %
+0000008b : 01b00533;   % 270: 	mv a0,s11 %
+0000008c : 0b9000ef;   % 271: 	jal printAllCharacters  %
+0000008d : 00148493;   % 273: 	addi s1,s1,1 %
+0000008e : 00800533;   % 274: 	mv a0,s0 %
+0000008f : 009005b3;   % 275: 	mv a1,s1 %
+00000090 : 01900633;   % 276: 	mv a2,s9 %
+00000091 : 01a006b3;   % 277: 	mv a3,s10 %
+00000092 : 7b8000ef;   % 278: 	jal getManhathamDistance %
+00000093 : 00500293;   % 280: 	li t0,5 %
+00000094 : 00a2c463;   % 281: 	bgt a0,t0,DonnutMovingOptionsDown %
+00000095 : 0d00006f;   % 282: 	j finishNextMovementPosition %
+00000096 : 00800533;   % 285: 	mv a0,s0 %
+00000097 : 00000593;   % 286: 	li a1,0 %
+00000098 : 01900633;   % 287: 	mv a2,s9 %
+00000099 : 00000693;   % 288: 	li a3,0 %
+0000009a : 798000ef;   % 289: 	jal getManhathamDistance %
+0000009b : 01a504b3;   % 291: 	add s1,a0,s10 %
+0000009c : ffb48493;   % 292: 	addi s1,s1,-5 %
+0000009d : 0b00006f;   % 294: 	j finishNextMovementPosition %
+0000009e : 00800533;   % 297: 	mv a0,s0 %
+0000009f : 009005b3;   % 298: 	mv a1,s1 %
+000000a0 : 1a4000ef;   % 299: 	jal resetHighlightedMapPosition %
+000000a1 : 01b00533;   % 300: 	mv a0,s11 %
+000000a2 : 061000ef;   % 301: 	jal printAllCharacters  %
+000000a3 : 00140413;   % 303: 	addi s0,s0,1 %
+000000a4 : 00800533;   % 304: 	mv a0,s0 %
+000000a5 : 009005b3;   % 305: 	mv a1,s1 %
+000000a6 : 01900633;   % 306: 	mv a2,s9 %
+000000a7 : 01a006b3;   % 307: 	mv a3,s10 %
+000000a8 : 760000ef;   % 308: 	jal getManhathamDistance %
+000000a9 : 00500293;   % 310: 	li t0,5 %
+000000aa : 00a2c463;   % 311: 	bgt a0,t0,DonnutMovingOptionsRight %
+000000ab : 0780006f;   % 312: 	j finishNextMovementPosition %
+000000ac : 00000513;   % 315: 	li a0,0 %
+000000ad : 009005b3;   % 316: 	mv a1,s1 %
+000000ae : 00000613;   % 317: 	li a2,0 %
+000000af : 01a006b3;   % 318: 	mv a3,s10 %
+000000b0 : 740000ef;   % 319: 	jal getManhathamDistance %
+000000b1 : 01950433;   % 321: 	add s0,a0,s9 %
+000000b2 : ffb40413;   % 322: 	addi s0,s0,-5 %
+000000b3 : 0580006f;   % 324: 	j finishNextMovementPosition %
+000000b4 : 00800533;   % 327: 	mv a0,s0 %
+000000b5 : 009005b3;   % 328: 	mv a1,s1 %
+000000b6 : 14c000ef;   % 329: 	jal resetHighlightedMapPosition %
+000000b7 : 01b00533;   % 330: 	mv a0,s11 %
+000000b8 : 009000ef;   % 331: 	jal printAllCharacters  %
+000000b9 : fff40413;   % 333: 	addi s0,s0,-1 %
+000000ba : 00800533;   % 334: 	mv a0,s0 %
+000000bb : 009005b3;   % 335: 	mv a1,s1 %
+000000bc : 01900633;   % 336: 	mv a2,s9 %
+000000bd : 01a006b3;   % 337: 	mv a3,s10 %
+000000be : 708000ef;   % 338: 	jal getManhathamDistance %
+000000bf : 00500293;   % 340: 	li t0,5 %
+000000c0 : 00a2c463;   % 341: 	bgt a0,t0,DonnutMovingOptionsLeft %
+000000c1 : 0200006f;   % 342: 	j finishNextMovementPosition %
+000000c2 : 00000513;   % 345: 	li a0,0 %
+000000c3 : 009005b3;   % 346: 	mv a1,s1 %
+000000c4 : 00000613;   % 347: 	li a2,0 %
+000000c5 : 01a006b3;   % 348: 	mv a3,s10 %
+000000c6 : 6e8000ef;   % 349: 	jal getManhathamDistance %
+000000c7 : 005c8413;   % 351: 	addi s0,s9,5 %
+000000c8 : 40a40433;   % 352: 	sub s0,s0,a0 %
+000000c9 : 00800533;   % 355: 	mv a0,s0 %
+000000ca : 009005b3;   % 356: 	mv a1,s1 %
+000000cb : 034000ef;   % 357: 	jal paintBorder %
+000000cc : e69ff06f;   % 358: 	j changePositionLoop %
+000000cd : 5b0000ef;   % 360: 	jal resetMovingOptions		#tira os destaques do mapa %
+000000ce : 778000ef;   % 361: 	jal getCharacterByCoordinate	#muda posicao do personagem no arquivo %
+000000cf : 00850023;   % 362: 	sb s0,0(a0) %
+000000d0 : 009500a3;   % 363: 	sb s1,1(a0) %
+000000d1 : 00800cb3;   % 368: 	mv s9,s0 %
+000000d2 : 00900d33;   % 369: 	mv s10,s1 %
+000000d3 : 01b00533;   % 370: 	mv a0,s11 %
+000000d4 : 798000ef;   % 371: 	jal printAllCharacters %
+000000d5 : 00012083;   % 373: 	lw ra,0(sp) %
+000000d6 : 00410113;   % 374: 	addi sp,sp,4 %
+000000d7 : 00008067;   % 375: 	ret %
+000000d8 : ffc10113;   % 381: 	addi sp,sp,-4 %
+000000d9 : 00112023;   % 382: 	sw ra,0(sp) %
+000000da : 00459613;   % 384: 	slli a2,a1,4	 %
+000000db : 00451593;   % 385: 	slli a1,a0,4 %
+000000dc : 00160613;   % 386: 	addi a2,a2,1 %
+000000dd : 00158593;   % 387: 	addi a1,a1,1 %
+000000de : 0fc10517;   % 389: 	lb a0,menu_white %
+000000df : 70d50503;   % 389:  %
+000000e0 : 0fc10797;   % 390: 	lw a5,frame_zero %
+000000e1 : 7087a783;   % 390:  %
+000000e2 : 00e00693;   % 391: 	li a3,14 %
+000000e3 : 00100713;   % 392: 	li a4,1 %
+000000e4 : 3f9000ef;   % 393: 	jal drawSquare %
+000000e5 : 00100693;   % 395: 	li a3,1 %
+000000e6 : 00e00713;   % 396: 	li a4,14 %
+000000e7 : 3ed000ef;   % 397: 	jal drawSquare %
+000000e8 : 00e58593;   % 399: 	addi a1,a1,14 %
+000000e9 : 3e5000ef;   % 400: 	jal drawSquare %
+000000ea : ff258593;   % 402: 	addi a1,a1,-14 %
+000000eb : 00e60613;   % 403: 	addi a2,a2,14 %
+000000ec : 00e00693;   % 404: 	li a3,14 %
+000000ed : 00100713;   % 405: 	li a4,1 %
+000000ee : 3d1000ef;   % 406: 	jal drawSquare %
+000000ef : 00012083;   % 408: 	lw ra,0(sp) %
+000000f0 : 00410113;   % 409: 	addi sp,sp,4 %
+000000f1 : 00008067;   % 410: 	ret %
+000000f2 : fe810113;   % 414: 	addi sp,sp,-24 %
+000000f3 : 00112023;   % 415: 	sw ra,0(sp) %
+000000f4 : 00a12223;   % 416: 	sw a0,4(sp) %
+000000f5 : 00b12423;   % 417: 	sw a1,8(sp) %
+000000f6 : 00c12623;   % 418: 	sw a2,12(sp) %
+000000f7 : 00d12823;   % 419: 	sw a3,16(sp) %
+000000f8 : 00812a23;   % 420: 	sw s0,20(sp) %
+000000f9 : 00a00433;   % 422: 	mv s0,a0 %
+000000fa : 5b8000ef;   % 423: 	jal getTileCode %
+000000fb : 2b5000ef;   % 424: 	jal getTile	 %
+000000fc : 00459613;   % 426: 	slli a2,a1,4 %
+000000fd : 00441593;   % 427: 	slli a1,s0,4 %
+000000fe : 0fc10697;   % 429: 	lw a3,frame_zero %
+000000ff : 6906a683;   % 429:  %
+00000100 : 31d000ef;   % 430: 	jal drawImage %
+00000101 : 00012083;   % 432: 	lw ra,0(sp) %
+00000102 : 00412503;   % 433: 	lw a0,4(sp) %
+00000103 : 00812583;   % 434: 	lw a1,8(sp) %
+00000104 : 00c12603;   % 435: 	lw a2,12(sp) %
+00000105 : 01012683;   % 436: 	lw a3,16(sp) %
+00000106 : 01412403;   % 437: 	lw s0,20(sp) %
+00000107 : 01810113;   % 438: 	addi sp,sp,24 %
+00000108 : 00008067;   % 439: 	ret %
+00000109 : ff810113;   % 442: 	addi sp,sp,-8 %
+0000010a : 00112023;   % 443: 	sw ra,0(sp) %
+0000010b : 00912223;   % 444: 	sw s1,4(sp) %
+0000010c : 00459613;   % 446: 	slli a2,a1,4 %
+0000010d : 00451493;   % 447: 	slli s1,a0,4	 %
+0000010e : 580000ef;   % 449: 	jal getHighlightedTile %
+0000010f : 009005b3;   % 451: 	mv a1,s1 %
+00000110 : 0fc10697;   % 453: 	lw a3,frame_zero %
+00000111 : 6486a683;   % 453:  %
+00000112 : 2d5000ef;   % 454: 	jal drawImage %
+00000113 : 00012083;   % 456: 	lw ra,0(sp) %
+00000114 : 00412483;   % 457: 	lw s1,4(sp) %
+00000115 : 00810113;   % 458: 	addi sp,sp,8 %
+00000116 : 00008067;   % 459: 	ret %
+00000117 : ffc10113;   % 462: 	addi sp,sp,-4 %
+00000118 : 00112023;   % 463: 	sw ra,0(sp) %
+00000119 : 0fc10797;   % 469: 	lw a5,frame_zero	# prepara para chamada de procedimento de drawSquare %
+0000011a : 6247a783;   % 469:  %
+0000011b : 00a00393;   % 471: 	li t2,10 %
+0000011c : 0e7cca63;   % 472: 	blt s9,t2,rightSideMenu %
+0000011d : 0fc10517;   % 475: 	lb a0,menu_yellow %
+0000011e : 61250503;   % 475:  %
+0000011f : 01400593;   % 476: 	li a1,20 %
+00000120 : 01400613;   % 477: 	li a2,20 %
+00000121 : 05200693;   % 478: 	li a3,82 %
+00000122 : 00100713;   % 479: 	li a4,1 %
+00000123 : 2fd000ef;   % 482: 	jal drawSquare	#desenha borda superior %
+00000124 : 04600613;   % 484: 	li a2,70 %
+00000125 : 2f5000ef;   % 486: 	jal drawSquare	#desenha borda inferior %
+00000126 : 01400613;   % 488: 	li a2,20 %
+00000127 : 00100693;   % 489: 	li a3,1 %
+00000128 : 03200713;   % 490: 	li a4,50 %
+00000129 : 2e5000ef;   % 493: 	jal drawSquare	#desenha borda lateral esquerda %
+0000012a : 06600593;   % 494: 	li a1,102 %
+0000012b : 2dd000ef;   % 496: 	jal drawSquare	#desenha borda lateral direita %
+0000012c : 0fc10517;   % 498: 	lb a0, menu_blue %
+0000012d : 5d450503;   % 498:  %
+0000012e : 01500593;   % 499: 	li a1,21 %
+0000012f : 01500613;   % 500: 	li a2,21 %
+00000130 : 05100693;   % 501: 	li a3,81 %
+00000131 : 03100713;   % 502: 	li a4,49 %
+00000132 : 2c1000ef;   % 504: 	jal drawSquare	# desenha fundo do menu %
+00000133 : 00000513;   % 506: 	li a0,0 %
+00000134 : 6f0000ef;   % 507: 	jal drawLeftSideMenuOptions %
+00000135 : 00000593;   % 509: 	li a1,0 	#a1 marca indice da escolha %
+00000136 : 1f9000ef;   % 512: 	jal readKeyBlocking %
+00000137 : 07700313;   % 514: 	li t1,'w' %
+00000138 : 02650463;   % 515: 	beq a0,t1,leftMenuMovesUp %
+00000139 : 07300313;   % 517: 	li t1,'s' %
+0000013a : 00650863;   % 518: 	beq a0,t1,leftMenuMovesDown %
+0000013b : 02000313;   % 520: 	li t1,' ' %
+0000013c : 02650a63;   % 521: 	beq a0,t1,LeftMenuChosen %
+0000013d : fe5ff06f;   % 522: 	j LeftMenuLoop %
+0000013e : 00158593;   % 525: 	addi a1,a1,1 %
+0000013f : 00300313;   % 527: 	li t1,3 %
+00000140 : 0265e5b3;   % 528: 	rem a1,a1,t1 %
+00000141 : 0100006f;   % 529: 	j leftMenuClosingSteps %
+00000142 : 00258593;   % 532: 	addi a1,a1,2 %
+00000143 : 00300313;   % 534: 	li t1,3 %
+00000144 : 0265f5b3;   % 535: 	remu a1,a1,t1 %
+00000145 : 00b00533;   % 538: 	mv a0,a1 %
+00000146 : 6a8000ef;   % 539: 	jal drawLeftSideMenuOptions %
+00000147 : 00a005b3;   % 540: 	mv a1,a0 %
+00000148 : fb9ff06f;   % 542: 	j LeftMenuLoop %
+00000149 : 00100313;   % 545: 	li t1,1 %
+0000014a : 02b30663;   % 546: 	beq t1,a1,OpenLeftWeaponChoice %
+0000014b : 00200313;   % 548: 	li t1,2 %
+0000014c : 00658463;   % 549: 	beq a1, t1,FinishLeftMenu %
+0000014d : fa5ff06f;   % 551: 	j LeftMenuLoop %
+0000014e : 00000513;   % 554: 	li a0,0 %
+0000014f : 108000ef;   % 555: 	jal resetOptionsMenu %
+00000150 : 01b00533;   % 557: 	mv a0,s11 %
+00000151 : 5a4000ef;   % 558: 	jal printAllCharacters %
+00000152 : 00012083;   % 560: 	lw ra,0(sp) %
+00000153 : 00410113;   % 561: 	addi sp,sp,4 %
+00000154 : 00008067;   % 563: 	ret %
+00000155 : 00000513;   % 566: 	li a0,0	# marca que deves-se usar o lado direito %
+00000156 : 174000ef;   % 567: 	jal OpenWeaponChoice %
+00000157 : f7dff06f;   % 569: 	j LeftMenuLoop  %
+00000158 : 00008067;   % 571: 	ret %
+00000159 : 0fc10517;   % 575: 	lb a0,menu_yellow %
+0000015a : 52250503;   % 575:  %
+0000015b : 0da00593;   % 576: 	li a1,218 %
+0000015c : 01400613;   % 577: 	li a2,20 %
+0000015d : 05200693;   % 578: 	li a3,82 %
+0000015e : 00100713;   % 579: 	li a4,1 %
+0000015f : 20d000ef;   % 581: 	jal drawSquare	#desenha borda superior %
+00000160 : 04600613;   % 583: 	li a2,70 %
+00000161 : 205000ef;   % 585: 	jal drawSquare	#desenha borda inferior %
+00000162 : 01400613;   % 587: 	li a2,20 %
+00000163 : 00100693;   % 588: 	li a3,1 %
+00000164 : 03200713;   % 589: 	li a4,50 %
+00000165 : 1f5000ef;   % 591: 	jal drawSquare	#desenha borda lateral esquerda %
+00000166 : 12c00593;   % 593: 	li a1,300 %
+00000167 : 1ed000ef;   % 595: 	jal drawSquare	#desenha borda lateral direita %
+00000168 : 0fc10517;   % 597: 	lb a0, menu_blue %
+00000169 : 4e450503;   % 597:  %
+0000016a : 0db00593;   % 598: 	li a1,219 %
+0000016b : 01500613;   % 599: 	li a2,21 %
+0000016c : 05100693;   % 600: 	li a3,81 %
+0000016d : 03100713;   % 601: 	li a4,49 %
+0000016e : 1d1000ef;   % 603: 	jal drawSquare	# desenha fundo do menu %
+0000016f : 00000513;   % 605: 	li a0,0 %
+00000170 : 6c4000ef;   % 606: 	jal drawRightSideMenuOptions %
+00000171 : 00000593;   % 608: 	li a1,0 	#a1 marca indice da escolha %
+00000172 : 109000ef;   % 611: 	jal readKeyBlocking %
+00000173 : 07700313;   % 613: 	li t1,'w' %
+00000174 : 02650463;   % 614: 	beq a0,t1,rightMenuMovesUp %
+00000175 : 07300313;   % 616: 	li t1,'s' %
+00000176 : 00650863;   % 617: 	beq a0,t1,rightMenuMovesDown %
+00000177 : 02000313;   % 619: 	li t1,' ' %
+00000178 : 02650a63;   % 620: 	beq a0,t1,rightMenuChosen %
+00000179 : fe5ff06f;   % 621: 	j rightMenuLoop %
+0000017a : 00158593;   % 624: 	addi a1,a1,1 %
+0000017b : 00300313;   % 626: 	li t1,3 %
+0000017c : 0265e5b3;   % 627: 	rem a1,a1,t1 %
+0000017d : 0100006f;   % 628: 	j rightMenuClosingSteps %
+0000017e : 00258593;   % 631: 	addi a1,a1,2 %
+0000017f : 00300313;   % 633: 	li t1,3 %
+00000180 : 0265f5b3;   % 634: 	remu a1,a1,t1 %
+00000181 : 00b00533;   % 637: 	mv a0,a1 %
+00000182 : 67c000ef;   % 638: 	jal drawRightSideMenuOptions %
+00000183 : 00a005b3;   % 639: 	mv a1,a0 %
+00000184 : fb9ff06f;   % 641: 	j rightMenuLoop %
+00000185 : 00100313;   % 644: 	li t1,1 %
+00000186 : 0ab30463;   % 645: 	beq t1,a1,OpenRightWeaponChoice %
+00000187 : 00200313;   % 647: 	li t1,2 %
+00000188 : 00658463;   % 648: 	beq a1, t1,FinishRightMenu %
+00000189 : fa5ff06f;   % 650: 	j rightMenuLoop %
+0000018a : 00100513;   % 653: 	li a0,1 %
+0000018b : 018000ef;   % 654: 	jal resetOptionsMenu %
+0000018c : 01b00533;   % 656: 	mv a0,s11 %
+0000018d : 4b4000ef;   % 657: 	jal printAllCharacters %
+0000018e : 00012083;   % 659: 	lw ra,0(sp) %
+0000018f : 00410113;   % 660: 	addi sp,sp,4 %
+00000190 : 00008067;   % 662: 	ret %
+00000191 : fec10113;   % 665: 	addi sp,sp,-20 %
+00000192 : 00112023;   % 666: 	sw ra,0(sp) %
+00000193 : 00812223;   % 667: 	sw s0,4(sp) %
+00000194 : 00912423;   % 668: 	sw s1,8(sp) %
+00000195 : 01212623;   % 669: 	sw s2,12(sp) %
+00000196 : 01312823;   % 670: 	sw s3,16(sp) %
+00000197 : 00100493;   % 672: 	li s1,1 %
+00000198 : 00800993;   % 673: 	li s3,8 %
+00000199 : 00951863;   % 675: 	bne a0,s1,leftSideResetOptions %
+0000019a : 00d00413;   % 676: 	li s0,13	#atualiza os marcadores %
+0000019b : 01300913;   % 677: 	li s2,19 %
+0000019c : 00c0006f;   % 678: 	j resetOptionsMenuOutterLoop %
+0000019d : 00100413;   % 680: 	li s0,1 %
+0000019e : 00800913;   % 681: 	li s2,8 %
+0000019f : 03348463;   % 683: 	beq s1,s3,endResetOptionsMenuOutterLoop %
+000001a0 : 01240c63;   % 686: 	beq s0,s2,endResetOptionsMenuInnerLoop %
+000001a1 : 00800533;   % 687: 	mv a0,s0 %
+000001a2 : 009005b3;   % 688: 	mv a1,s1 %
+000001a3 : d3dff0ef;   % 689: 	jal resetMapPosition %
+000001a4 : 00140413;   % 690: 	addi s0,s0,1 %
+000001a5 : fedff06f;   % 691: 	j resetOptionsMenuInnerLoop %
+000001a6 : ff940413;   % 694: 	addi s0,s0,-7 %
+000001a7 : 00148493;   % 695: 	addi s1,s1,1 %
+000001a8 : fddff06f;   % 696: 	j resetOptionsMenuOutterLoop %
+000001a9 : 00012083;   % 699: 	lw ra,0(sp) %
+000001aa : 00412403;   % 700: 	lw s0,4(sp) %
+000001ab : 00812483;   % 701: 	lw s1,8(sp) %
+000001ac : 00c12903;   % 702: 	lw s2,12(sp) %
+000001ad : 01012983;   % 703: 	lw s3,16(sp) %
+000001ae : 01410113;   % 704: 	addi sp,sp,20 %
+000001af : 00008067;   % 706: 	ret %
+000001b0 : 00100513;   % 710: 	li a0,1		# maraca que deves-se usar o lado direito %
+000001b1 : 008000ef;   % 711: 	jal OpenWeaponChoice %
+000001b2 : f01ff06f;   % 713: 	j rightMenuLoop %
+000001b3 : ff810113;   % 717: 	addi sp,sp,-8 %
+000001b4 : 00112023;   % 718: 	sw ra,0(sp) %
+000001b5 : 00a12223;   % 719: 	sw a0,4(sp) %
+000001b6 : 3ac000ef;   % 721: 	jal getWeaponDrawPosition # armazena as coordenadas de pintura da caixinha a1,a2, de acordo com o que recebeu em a0 %
+000001b7 : 0fc10517;   % 723: 	lb a0,menu_white %
+000001b8 : 3a950503;   % 723:  %
+000001b9 : ffe58593;   % 724: 	addi a1,a1,-2 %
+000001ba : ffe60613;   % 725: 	addi a2,a2,-2 %
+000001bb : 01400693;   % 726: 	li a3,20		#printa caixa externa(margens) %
+000001bc : 01400713;   % 727: 	li a4,20 %
+000001bd : 095000ef;   % 729: 	jal drawSquare %
+000001be : 0fc10517;   % 731: 	lb a0,menu_blue %
+000001bf : 38c50503;   % 731:  %
+000001c0 : 00158593;   % 732: 	addi a1,a1,1	#pinta fundo %
+000001c1 : 00160613;   % 733: 	addi a2,a2,1 %
+000001c2 : 01200693;   % 735: 	li a3,18 %
+000001c3 : 01200713;   % 736: 	li a4,18 %
+000001c4 : 079000ef;   % 738: 	jal drawSquare %
+000001c5 : 00158593;   % 740: 	addi a1,a1,1	#restaura os valores de pinura das weapons %
+000001c6 : 00160613;   % 741: 	addi a2,a2,1 %
+000001c7 : 394000ef;   % 743: 	jal getCharacterByCoordinate #pega o persoangem %
+000001c8 : 00350403;   % 745: 	lb s0,3(a0) 	# pega a arma do personagem %
+000001c9 : 00800533;   % 747: 	mv a0,s0 %
+000001ca : 300000ef;   % 748: 	jal getWeaponImage	 		#oega sprite da arma  %
+000001cb : 0fc10697;   % 749: 	lw a3,frame_zero 	#desenha arma do persoagem %
+000001cc : 35c6a683;   % 749:  %
+000001cd : 7e8000ef;   % 751: 	jal drawImage %
+000001ce : 798000ef;   % 754: 	jal readKeyBlocking %
+000001cf : 07700293;   % 755: 	li t0,'w' %
+000001d0 : 00550c63;   % 756: 	beq a0,t0,weaponChoiceLoopUp %
+000001d1 : 07300293;   % 758: 	li t0,'s'	 %
+000001d2 : 04550c63;   % 759: 	beq a0,t0,weaponChoiceLoopDown %
+000001d3 : 02000293;   % 761: 	li t0,' ' %
+000001d4 : 08550c63;   % 762: 	beq a0,t0,weaponChosen %
+000001d5 : fe5ff06f;   % 764: 	j weaponChoiceLoop %
+000001d6 : 0fc10517;   % 768: 	lb a0,menu_blue %
+000001d7 : 32c50503;   % 768:  %
+000001d8 : 00d007b3;   % 769: 	mv a5,a3		#tampa imagem anterior %
+000001d9 : fff58593;   % 770: 	addi a1,a1,-1 %
+000001da : fff60613;   % 771: 	addi a2,a2,-1 %
+000001db : 01200693;   % 772: 	li a3,18 %
+000001dc : 01200713;   % 773: 	li a4,18 %
+000001dd : 015000ef;   % 774: 	jal drawSquare %
+000001de : 00158593;   % 775: 	addi a1,a1,1 %
+000001df : 00160613;   % 776: 	addi a2,a2,1 %
+000001e0 : 00f006b3;   % 778: 	mv a3,a5 %
+000001e1 : 00240413;   % 780: 	addi s0,s0,2 %
+000001e2 : 00300313;   % 781: 	li t1,3 %
+000001e3 : 02646433;   % 782: 	rem s0,s0,t1 %
+000001e4 : 00800533;   % 783: 	mv a0,s0 %
+000001e5 : 294000ef;   % 784: 	jal getWeaponImage	 %
+000001e6 : 784000ef;   % 785: 	jal drawImage		 %
+000001e7 : f9dff06f;   % 787: 	j weaponChoiceLoop %
+000001e8 : 0fc10517;   % 790: 	lb a0,menu_blue %
+000001e9 : 2e450503;   % 790:  %
+000001ea : 00d007b3;   % 791: 	mv a5,a3		#tampa imagem anterior %
+000001eb : fff58593;   % 792: 	addi a1,a1,-1 %
+000001ec : fff60613;   % 793: 	addi a2,a2,-1 %
+000001ed : 01200693;   % 794: 	li a3,18 %
+000001ee : 01200713;   % 795: 	li a4,18 %
+000001ef : 7cc000ef;   % 796: 	jal drawSquare %
+000001f0 : 00158593;   % 797: 	addi a1,a1,1 %
+000001f1 : 00160613;   % 798: 	addi a2,a2,1 %
+000001f2 : 00f006b3;   % 800: 	mv a3,a5 %
+000001f3 : 00140413;   % 802: 	addi s0,s0,1 %
+000001f4 : 00300313;   % 803: 	li t1,3 %
+000001f5 : 02646433;   % 804: 	rem s0,s0,t1 %
+000001f6 : 00800533;   % 805: 	mv a0,s0 %
+000001f7 : 24c000ef;   % 806: 	jal getWeaponImage	 %
+000001f8 : 73c000ef;   % 807: 	jal drawImage		 %
+000001f9 : f55ff06f;   % 809: 	j weaponChoiceLoop %
+000001fa : 2c8000ef;   % 812: 	jal getCharacterByCoordinate #pega o persoangem %
+000001fb : 008521a3;   % 813: 	sw s0,3(a0)	#salva arma do personagem %
+000001fc : 0fc10517;   % 815: 	lb a0,menu_blue %
+000001fd : 29450503;   % 815:  %
+000001fe : ffe58593;   % 816: 	addi a1,a1,-2 %
+000001ff : ffe60613;   % 817: 	addi a2,a2,-2 %
+00000200 : 01400693;   % 818: 	li a3,20 %
+00000201 : 01400713;   % 819: 	li a4,20		# apaga imagem da arma %
+00000202 : 0fc10797;   % 820: 	lw a5,frame_zero %
+00000203 : 2807a783;   % 820:  %
+00000204 : 778000ef;   % 821: 	jal drawSquare %
+00000205 : 00012083;   % 823: 	lw ra,0(sp) %
+00000206 : 00412503;   % 824: 	lw a0,4(sp) %
+00000207 : 00810113;   % 825: 	addi sp,sp,8 %
+00000208 : 00008067;   % 827: 	ret		#retorna %
+00000209 : fec10113;   % 831: 	addi sp,sp,-20		#colocar coisas na pilha %
+0000020a : 00112023;   % 832: 	sw ra,0(sp) %
+0000020b : 00812223;   % 833: 	sw s0,4(sp) %
+0000020c : 00912423;   % 834: 	sw s1,8(sp) %
+0000020d : 01212623;   % 835: 	sw s2,12(sp) %
+0000020e : 01312823;   % 836: 	sw s3,16(sp) %
+0000020f : ffbc8413;   % 838: 	addi s0,s9,-5   #	 %
+00000210 : ffbd0493;   % 839: 	addi s1,s10,-5	# posicao do canto esquerdo do quadrado que deve ser pintado %
+00000211 : 00c40913;   % 841: 	addi s2,s0,12	#condicoes de parada %
+00000212 : 00c48993;   % 842: 	addi s3,s1,12	 %
+00000213 : 07348a63;   % 845: 	beq s1,s3,endMovingOptionsOutterLoop %
+00000214 : 07240263;   % 847: 	beq s0,s2,endMovingOptionsInnerLoop %
+00000215 : 00000293;   % 849: 	li t0,0 %
+00000216 : 04544a63;   % 850: 	blt s0,t0,skipHighlightThisSquare %
+00000217 : 0454c863;   % 851: 	blt s1,t0,skipHighlightThisSquare %
+00000218 : 01400293;   % 852: 	li t0,20 %
+00000219 : 04545463;   % 853: 	bge s0,t0,skipHighlightThisSquare	#checam se o quadrado em questao esta dentro do bitmap %
+0000021a : 00f00293;   % 854: 	li t0,15 %
+0000021b : 0454d463;   % 855: 	bge s1,t0,endMovingOptionsInnerLoop %
+0000021c : 00800533;   % 857: 	mv a0,s0 %
+0000021d : 009005b3;   % 858: 	mv a1,s1 %
+0000021e : 01900633;   % 859: 	mv a2,s9 %
+0000021f : 01a006b3;   % 860: 	mv a3,s10 %
+00000220 : 180000ef;   % 861: 	jal getManhathamDistance %
+00000221 : 00500293;   % 862: 	li t0,5 %
+00000222 : 02a2c263;   % 863: 	bgt a0,t0,skipHighlightThisSquare %
+00000223 : 00800533;   % 865: 	mv a0,s0 %
+00000224 : 009005b3;   % 866: 	mv a1,s1 %
+00000225 : 124000ef;   % 867: 	jal getHighlightedTile %
+00000226 : 00441593;   % 869: 	slli a1,s0,4		#pinta o quadrado correspondente %
+00000227 : 00449613;   % 870: 	slli a2,s1,4 %
+00000228 : 0fc10697;   % 871: 	lw a3,frame_zero %
+00000229 : 1e86a683;   % 871:  %
+0000022a : 674000ef;   % 872: 	jal drawImage		 %
+0000022b : 00140413;   % 875: 	addi s0,s0,1 %
+0000022c : fa1ff06f;   % 876: 	j paintMovingOptionsInnerLoop %
+0000022d : 00148493;   % 879: 	addi s1,s1,1 %
+0000022e : ffbc8413;   % 880: 	addi s0,s9,-5 %
+0000022f : f91ff06f;   % 881: 	j paintMovingOptionsOutterLoop %
+00000230 : 01b00533;   % 884: 	mv a0,s11 %
+00000231 : 224000ef;   % 885: 	jal printAllCharacters  %
+00000232 : 00012083;   % 886: 	lw ra,0(sp) %
+00000233 : 00412403;   % 887: 	lw s0,4(sp) %
+00000234 : 00812483;   % 888: 	lw s1,8(sp) %
+00000235 : 00c12903;   % 889: 	lw s2,12(sp) %
+00000236 : 01012983;   % 890: 	lw s3,16(sp) %
+00000237 : 01410113;   % 891: 	addi sp,sp,20 %
+00000238 : 00008067;   % 893: 	ret %
+00000239 : fec10113;   % 896: 	addi sp,sp,-20		#colocar coisas na pilha %
+0000023a : 00112023;   % 897: 	sw ra,0(sp) %
+0000023b : 00812223;   % 898: 	sw s0,4(sp) %
+0000023c : 00912423;   % 899: 	sw s1,8(sp) %
+0000023d : 01212623;   % 900: 	sw s2,12(sp) %
+0000023e : 01312823;   % 901: 	sw s3,16(sp) %
+0000023f : ffbc8413;   % 903: 	addi s0,s9,-5   #	 %
+00000240 : ffbd0493;   % 904: 	addi s1,s10,-5	# posicao do canto esquerdo do quadrado que deve ser pintado %
+00000241 : 00c40913;   % 906: 	addi s2,s0,12	#condicoes de parada %
+00000242 : 00c48993;   % 907: 	addi s3,s1,12	 %
+00000243 : 07348c63;   % 910: 	beq s1,s3,endResetMovingOptionsOutterLoop %
+00000244 : 07240463;   % 912: 	beq s0,s2,endResetMovingOptionsInnerLoop %
+00000245 : 00000293;   % 914: 	li t0,0 %
+00000246 : 04544c63;   % 915: 	blt s0,t0,skipResetThisSquare %
+00000247 : 0454ca63;   % 916: 	blt s1,t0,skipResetThisSquare %
+00000248 : 01400293;   % 917: 	li t0,20 %
+00000249 : 04545663;   % 918: 	bge s0,t0,skipResetThisSquare	#checam se o quadrado em questao esta dentro do bitmap %
+0000024a : 00f00293;   % 919: 	li t0,15 %
+0000024b : 0454d663;   % 920: 	bge s1,t0,endResetMovingOptionsInnerLoop %
+0000024c : 00800533;   % 922: 	mv a0,s0 %
+0000024d : 009005b3;   % 923: 	mv a1,s1 %
+0000024e : 01900633;   % 924: 	mv a2,s9 %
+0000024f : 01a006b3;   % 925: 	mv a3,s10 %
+00000250 : 0c0000ef;   % 926: 	jal getManhathamDistance %
+00000251 : 00500293;   % 927: 	li t0,5 %
+00000252 : 02a2c463;   % 928: 	bgt a0,t0,skipResetThisSquare %
+00000253 : 00800533;   % 930: 	mv a0,s0 %
+00000254 : 009005b3;   % 931: 	mv a1,s1 %
+00000255 : 04c000ef;   % 932: 	jal getTileCode %
+00000256 : 548000ef;   % 933: 	jal getTile %
+00000257 : 00441593;   % 935: 	slli a1,s0,4		#pinta o quadrado correspondente %
+00000258 : 00449613;   % 936: 	slli a2,s1,4 %
+00000259 : 0fc10697;   % 937: 	lw a3,frame_zero %
+0000025a : 1246a683;   % 937:  %
+0000025b : 5b0000ef;   % 938: 	jal drawImage		 %
+0000025c : 00140413;   % 941: 	addi s0,s0,1 %
+0000025d : f9dff06f;   % 942: 	j resetMovingOptionsInnerLoop %
+0000025e : 00148493;   % 945: 	addi s1,s1,1 %
+0000025f : ffbc8413;   % 946: 	addi s0,s9,-5 %
+00000260 : f8dff06f;   % 947: 	j resetMovingOptionsOutterLoop %
+00000261 : 00012083;   % 949: 	lw ra,0(sp) %
+00000262 : 00412403;   % 950: 	lw s0,4(sp) %
+00000263 : 00812483;   % 951: 	lw s1,8(sp) %
+00000264 : 00c12903;   % 952: 	lw s2,12(sp) %
+00000265 : 01012983;   % 953: 	lw s3,16(sp) %
+00000266 : 01410113;   % 954: 	addi sp,sp,20 %
+00000267 : 00008067;   % 955: 	ret %
+00000268 : 01400293;   % 959: 	li t0,20 %
+00000269 : 02b282b3;   % 960: 	mul t0,t0,a1 %
+0000026a : 00a282b3;   % 961: 	add t0,t0,a0 %
+0000026b : 015282b3;   % 962: 	add t0,t0,s5	# t0 tem endereco da posicao %
+0000026c : 00028503;   % 963: 	lb a0,0(t0) %
+0000026d : 00008067;   % 964: 	ret %
+0000026e : ffc10113;   % 967: 	addi sp,sp,-4 %
+0000026f : 00112023;   % 968: 	sw ra,0(sp) %
+00000270 : fe1ff0ef;   % 970: 	jal getTileCode %
+00000271 : 00100293;   % 971: 	li t0,1 %
+00000272 : 00550a63;   % 972: 	beq a0,t0,getHighlightedGrass %
+00000273 : 00200293;   % 974: 	li t0,2 %
+00000274 : 00550c63;   % 975: 	beq a0,t0,getHighlightedBush %
+00000275 : fff00513;   % 977: 	li a0,-1 %
+00000276 : 00008067;   % 978: 	ret %
+00000277 : 0fc10517;   % 981: 	la a0,HighlightedGrass	 %
+00000278 : 93c50513;   % 981:  %
+00000279 : 0100006f;   % 982: 	j endGetHighlightedTile %
+0000027a : 0fc0f517;   % 984: 	la a0,HighlightedBush	 %
+0000027b : 72050513;   % 984:  %
+0000027c : 0040006f;   % 985: 	j endGetHighlightedTile %
+0000027d : 00012083;   % 987: 	lw ra,0(sp) %
+0000027e : 00410113;   % 988: 	addi sp,sp,4 %
+0000027f : 00008067;   % 989: 	ret %
+00000280 : 40c502b3;   % 994: 	sub t0,a0,a2 %
+00000281 : 40d58333;   % 995: 	sub t1, a1,a3 %
+00000282 : 00000393;   % 996: 	li  t2,0 %
+00000283 : fff00e13;   % 997: 	li t3,-1 %
+00000284 : 0072d463;   % 998: 	bge t0,t2,Ymodule %
+00000285 : 03c282b3;   % 999: 	mul t0,t0,t3 %
+00000286 : 00735463;   % 1001: 	 bge t1,t2,endGetManhathamDistance %
+00000287 : 03c30333;   % 1002: 	 mul t1,t1,t3 %
+00000288 : 00530533;   % 1004: 	add a0,t1,t0 %
+00000289 : 00008067;   % 1005: 	ret %
+0000028a : 00000293;   % 1008: 	li t0,0 %
+0000028b : 00550e63;   % 1009: 	beq a0,t0,getComputerImage %
+0000028c : 00100293;   % 1011: 	li t0,1 %
+0000028d : 02550063;   % 1012: 	beq a0,t0,getCalculatorImage %
+0000028e : 00200293;   % 1014: 	li t0,2 %
+0000028f : 02550263;   % 1015: 	beq a0,t0,getPencilImage %
+00000290 : fff00513;   % 1017: 	li a0,-1 %
+00000291 : 00008067;   % 1018: 	ret %
+00000292 : 0fc10517;   % 1021: 	la a0,computer %
+00000293 : d2450513;   % 1021:  %
+00000294 : 00008067;   % 1022: 	ret %
+00000295 : 0fc10517;   % 1025: 	la a0,calculator %
+00000296 : e2050513;   % 1025:  %
+00000297 : 00008067;   % 1026: 	ret %
+00000298 : 0fc10517;   % 1029: 	la a0,pencil %
+00000299 : f1c50513;   % 1029:  %
+0000029a : 00008067;   % 1030: 	ret %
+0000029b : 00aa82b3;   % 1033: 	add t0,s5,a0 %
+0000029c : 01400313;   % 1035: 	li t1,20 %
+0000029d : 02b30333;   % 1036: 	mul t1,t1,a1 %
+0000029e : 00530333;   % 1038: 	add t1,t1,t0	#t1 armazena endereco da posicao %
+0000029f : 00030503;   % 1039: 	lb a0,0(t1) %
+000002a0 : 00008067;   % 1040: 	ret %
+000002a1 : 02700613;   % 1045: 	li a2, 39 %
+000002a2 : 00050c63;   % 1046: 	beq a0,zero,leftWeaponPosition %
+000002a3 : 00100293;   % 1047: 	li t0,1 %
+000002a4 : 00550c63;   % 1048: 	beq a0,t0,rightWeaponPosition %
+000002a5 : fff00593;   % 1049: 	li a1,-1 %
+000002a6 : fff00613;   % 1050: 	li a2,-1 %
+000002a7 : 00008067;   % 1051: 	ret %
+000002a8 : 03c00593;   % 1054: 	li a1,60 %
+000002a9 : 00008067;   % 1055: 	ret %
+000002aa : 10200593;   % 1057: 	li a1,258	 %
+000002ab : 00008067;   % 1059: 	ret %
+000002ac : 000b8383;   % 1065:   	lb t2, 0(s7)	# t2 armazena quantidade de personagens %
+000002ad : 001b8513;   % 1066: 	addi a0, s7,1	# a0 marca endereco de comeco de descricao dos personagens %
+000002ae : 00239393;   % 1068: 	slli t2,t2,2	 %
+000002af : 00a383b3;   % 1069: 	add t2,t2,a0	#t2 marca vector.end() (primeiro endereco nao pertencente ao vetor) %
+000002b0 : 02a38063;   % 1072:  	beq t2,a0,endGetCharacterByCoordinate %
+000002b1 : 00050283;   % 1074: 	lb t0,0(a0)	# pega coordenada x %
+000002b2 : 00150303;   % 1075: 	lb t1,1(a0)	# pega coordenada y %
+000002b3 : 01929663;   % 1077: 	bne t0,s9,keepGetCharacterByCoordinateLoop	#se nao encontrou, vai para a proxima iteracao %
+000002b4 : 01a31463;   % 1078: 	bne t1,s10,keepGetCharacterByCoordinateLoop %
+000002b5 : 00008067;   % 1080: 	ret	#achou o personagem, retornou o endereco %
+000002b6 : 00450513;   % 1083: 	addi a0,a0,4	#vai para proxima descricao de personagem %
+000002b7 : fe5ff06f;   % 1084: 	j getCharacterByCoordinateLoop %
+000002b8 : fff00513;   % 1087: 	li a0,-1 %
+000002b9 : 00008067;   % 1088: 	ret %
+000002ba : ff810113;   % 1091: 	addi sp,sp,-8 %
+000002bb : 00a12023;   % 1092: 	sw a0,0(sp) %
+000002bc : 00112223;   % 1093: 	sw ra,4(sp) %
+000002bd : 24c000ef;   % 1095: 	jal getAllies %
+000002be : 00a00bb3;   % 1097: 	mv s7,a0	# s7 armazena endereco dos aliados  (sera bastante usado) %
+000002bf : 0fc10597;   % 1099: 	la a1,Hero %
+000002c0 : a6058593;   % 1099:  %
+000002c1 : 0fc10617;   % 1100: 	lw a2,frame_zero	# printa aliados %
+000002c2 : f8462603;   % 1100:  %
+000002c3 : 030000ef;   % 1101: 	jal printCharacters %
+000002c4 : 00012503;   % 1103: 	lw a0,0(sp) %
+000002c5 : 278000ef;   % 1104: 	jal getEnemies %
+000002c6 : 00a00c33;   % 1106: 	mv s8,a0	# s8 armazena endereco dos inimigos  (sera bastante usado) %
+000002c7 : 0fc10597;   % 1108: 	la a1,Enemy	 %
+000002c8 : b4858593;   % 1108:  %
+000002c9 : 0fc10617;   % 1109: 	lw a2,frame_zero	# printa inimigos %
+000002ca : f6462603;   % 1109:  %
+000002cb : 010000ef;   % 1110: 	jal printCharacters %
+000002cc : 00412083;   % 1112: 	lw ra,4(sp) %
+000002cd : 00810113;   % 1113: 	addi sp,sp,8 %
+000002ce : 00008067;   % 1114: 	ret %
+000002cf : ff410113;   % 1117: 	addi sp,sp,-12			#sobrescreve s0,s1,s2 (colocar na pilha) %
+000002d0 : 00812023;   % 1118: 	sw s0,0(sp)	 %
+000002d1 : 00912223;   % 1119: 	sw s1,4(sp) %
+000002d2 : 01212423;   % 1120: 	sw s2,8(sp) %
+000002d3 : 00a00433;   % 1122: 	mv s0,a0  	# s0 contém enreco base do arquivo de character %
+000002d4 : 00c006b3;   % 1123: 	mv a3,a2 	#preparam para chamada da funcao DrawImage %
+000002d5 : 00b00533;   % 1124: 	mv a0,a1 %
+000002d6 : 00000493;   % 1127: 	li s1,0 	# s1 = contador %
+000002d7 : 00040903;   % 1128: 	lb s2,(s0)	# s2 = quantidade de characters %
+000002d8 : 00140413;   % 1129: 	addi s0,s0,1 %
+000002d9 : 05248463;   % 1132: 	beq s1,s2 endPrintCharacters	#se printou todos os caracteres -> finaliza procedimento %
+000002da : 00249293;   % 1133: 	slli t0,s1,2 	 %
+000002db : 008282b3;   % 1134: 	add t0,t0,s0 	#t0 aponta para a linha de descricao do s1-esimo character %
+000002dc : 00228583;   % 1136: 	lb a1,2(t0) %
+000002dd : 02b05863;   % 1137: 	ble a1,zero,nextPrintCharactersIteration %
+000002de : 00028583;   % 1139: 	lb a1,(t0) %
+000002df : 00459593;   % 1140: 	slli a1,a1,4	#a1 = pos_x em pixels do personagem %
+000002e0 : 00128603;   % 1142: 	lb a2,1(t0) %
+000002e1 : 00461613;   % 1143: 	slli a2,a2,4	#a2 = pos_y em pixels do personafem %
+000002e2 : ff810113;   % 1145: 	addi sp,sp,-8	#prepara a pilha para armazenar o endereco de retorno %
+000002e3 : 00112023;   % 1146: 	sw ra,0(sp) %
+000002e4 : 00a12223;   % 1147: 	sw a0,4(sp) %
+000002e5 : 388000ef;   % 1149: 	jal drawImage %
+000002e6 : 00012083;   % 1151: 	lw ra,0(sp)	#recupera o endereco de retorno %
+000002e7 : 00412503;   % 1152: 	lw a0,4(sp) %
+000002e8 : 00810113;   % 1153: 	addi sp,sp,8	 %
+000002e9 : 00148493;   % 1156: 	addi s1,s1,1 %
+000002ea : fbdff06f;   % 1157: 	j printCharactersLoop %
+000002eb : 00012403;   % 1159: 	lw s0,0(sp)	 %
+000002ec : 00412483;   % 1160: 	lw s1,4(sp) %
+000002ed : 00812903;   % 1161: 	lw s2,8(sp) %
+000002ee : 00c10113;   % 1162: 	addi sp,sp,12	 %
+000002ef : 00008067;   % 1163: 	ret %
+000002f0 : ff010113;   % 1167: 	addi sp,sp,-16 %
+000002f1 : 00a12023;   % 1168: 	sw a0,0(sp)		# coloca registradores na pilha %
+000002f2 : 00112223;   % 1169: 	sw ra,4(sp) %
+000002f3 : 00912423;   % 1170: 	sw s1,8(sp) %
+000002f4 : 00b12623;   % 1171: 	sw a1,12(sp) %
+000002f5 : 00a004b3;   % 1173: 	mv s1, a0 		# t1 esta com o indice da escolha %
+000002f6 : 00000293;   % 1175: 	li t0,0 %
+000002f7 : 0fc10517;   % 1177: 	la a0, atacar %
+000002f8 : eb450513;   % 1177:  %
+000002f9 : 01600593;   % 1178: 	li a1,22 %
+000002fa : 01600613;   % 1179: 	li a2,22		# adiciona as informacoes de de print do primeiro item da lista(excessao da cor) %
+000002fb : 00000713;   % 1180: 	li a4,0 %
+000002fc : 00549863;   % 1182: 	bne s1,t0,FirstLeftOptionOpaque %
+000002fd : 0000a6b7;   % 1183: 	li a3,39935	#cor caso a primeira opcao  esteja selecionada %
+000002fe : bff68693;   % 1183:  %
+000002ff : 00c0006f;   % 1184: 	j paintFirstLeftMenuOption %
+00000300 : 0000a6b7;   % 1187: 	li a3,39844	#cor caso a primeira opcao nao esteja selecionada %
+00000301 : ba468693;   % 1187:  %
+00000302 : 3c0000ef;   % 1190: 	jal printString		#printa primeiro item da lista %
+00000303 : 00100293;   % 1191: 	li t0,1 %
+00000304 : 0fc10517;   % 1192: 	la a0,arma	 %
+00000305 : e8750513;   % 1192:  %
+00000306 : 01600593;   % 1193: 	li a1,22 %
+00000307 : 01460613;   % 1194: 	addi a2,a2,20		# adiciona as informacoes de de print do segundo item da lista(excessao da cor) %
+00000308 : 00549863;   % 1195: 	bne s1,t0,secondLeftOptionOpaque %
+00000309 : 0000a6b7;   % 1196: 	li a3,39935	#cor caso a segunda opcao  esteja selecionada %
+0000030a : bff68693;   % 1196:  %
+0000030b : 00c0006f;   % 1197: 	j paintSecondLeftMenuOption %
+0000030c : 0000a6b7;   % 1199: 	li a3,39844		#cor caso a segunda opcao nao esteja selecionada %
+0000030d : ba468693;   % 1199:  %
+0000030e : 390000ef;   % 1201: 	jal printString %
+0000030f : 00200293;   % 1202: 	li t0,2 %
+00000310 : 0fc10517;   % 1203: 	la a0,wait %
+00000311 : e5c50513;   % 1203:  %
+00000312 : 01600593;   % 1204: 	li a1,22 %
+00000313 : 01460613;   % 1205: 	addi a2,a2,20 %
+00000314 : 00549863;   % 1206: 	bne s1,t0,ThirdLeftOptionOpaque	# adiciona as informacoes de de print do terceiro item da lista(excessao da cor)	 %
+00000315 : 0000a6b7;   % 1207: 	li a3,39935	#cor caso a segunda opcao  esteja selecionada %
+00000316 : bff68693;   % 1207:  %
+00000317 : 00c0006f;   % 1208: 	j paintLeftThirdOption	 %
+00000318 : 0000a6b7;   % 1210: 	li a3,39844 %
+00000319 : ba468693;   % 1210:  %
+0000031a : 360000ef;   % 1212: 	jal printString		#printa terceiro item da lista %
+0000031b : 00012503;   % 1214: 	lw a0,0(sp) %
+0000031c : 00412083;   % 1215: 	lw ra,4(sp)			#restaura a0 e ra com valores da pilha %
+0000031d : 00812483;   % 1216: 	lw s1,8(sp) %
+0000031e : 00c12583;   % 1217: 	lw a1,12(sp) %
+0000031f : 01010113;   % 1218: 	addi sp,sp,16 %
+00000320 : 00008067;   % 1219: 	ret %
+00000321 : ff410113;   % 1223: 	addi sp,sp,-12		 %
+00000322 : 00a12023;   % 1224: 	sw a0,0(sp)		# coloca registradores na pilha %
+00000323 : 00112223;   % 1225: 	sw ra,4(sp) %
+00000324 : 00912423;   % 1226: 	sw s1,8(sp) %
+00000325 : 00a004b3;   % 1228: 	mv s1, a0 		# t1 esta com o indice da escolha %
+00000326 : 00000293;   % 1230: 	li t0,0 %
+00000327 : 0fc10517;   % 1232: 	la a0, atacar %
+00000328 : df450513;   % 1232:  %
+00000329 : 0db00593;   % 1233: 	li a1,219 %
+0000032a : 01600613;   % 1234: 	li a2,22		# adiciona as informacoes de de print do primeiro item da lista(excessao da cor) %
+0000032b : 00000713;   % 1235: 	li a4,0 %
+0000032c : 00549863;   % 1237: 	bne s1,t0,FirstRightOptionOpaque %
+0000032d : 0000a6b7;   % 1238: 	li a3,39935	#cor caso a primeira opcao  esteja selecionada %
+0000032e : bff68693;   % 1238:  %
+0000032f : 00c0006f;   % 1239: 	j paintFirstRightMenuOption %
+00000330 : 0000a6b7;   % 1242: 	li a3,39844	#cor caso a primeira opcao nao esteja selecionada %
+00000331 : ba468693;   % 1242:  %
+00000332 : 300000ef;   % 1245: 	jal printString		#printa primeiro item da lista %
+00000333 : 00100293;   % 1246: 	li t0,1 %
+00000334 : 0fc10517;   % 1247: 	la a0,arma	 %
+00000335 : dc750513;   % 1247:  %
+00000336 : 0db00593;   % 1248: 	li a1,219 %
+00000337 : 01460613;   % 1249: 	addi a2,a2,20		# adiciona as informacoes de de print do segundo item da lista(excessao da cor) %
+00000338 : 00549863;   % 1250: 	bne s1,t0,secondRightOptionOpaque %
+00000339 : 0000a6b7;   % 1251: 	li a3,39935	#cor caso a segunda opcao  esteja selecionada %
+0000033a : bff68693;   % 1251:  %
+0000033b : 00c0006f;   % 1252: 	j paintSecondRightMenuOption %
+0000033c : 0000a6b7;   % 1254: 	li a3,39844		#cor caso a segunda opcao nao esteja selecionada %
+0000033d : ba468693;   % 1254:  %
+0000033e : 2d0000ef;   % 1256: 	jal printString		#printa segundo item da lista %
+0000033f : 00200293;   % 1257: 	li t0,2		 %
+00000340 : 0fc10517;   % 1258: 	la a0,wait %
+00000341 : d9c50513;   % 1258:  %
+00000342 : 0db00593;   % 1259: 	li a1,219 %
+00000343 : 01460613;   % 1260: 	addi a2,a2,20 %
+00000344 : 00549863;   % 1261: 	bne s1,t0,ThirdRightOptionOpaque	# adiciona as informacoes de de print do terceiro item da lista(excessao da cor)	 %
+00000345 : 0000a6b7;   % 1262: 	li a3,39935 #cor caso a segunda opcao  esteja selecionada %
+00000346 : bff68693;   % 1262:  %
+00000347 : 00c0006f;   % 1263: 	j paintRightThirdOption	 %
+00000348 : 0000a6b7;   % 1265: 	li a3,39844 %
+00000349 : ba468693;   % 1265:  %
+0000034a : 2a0000ef;   % 1267: 	jal printString		#printa terceiro item da lista %
+0000034b : 00012503;   % 1270: 	lw a0,0(sp)		# restaura pilha pilha %
+0000034c : 00412083;   % 1271: 	lw ra,4(sp) %
+0000034d : 00812483;   % 1272: 	lw s1,8(sp) %
+0000034e : 00c10113;   % 1273: 	addi sp,sp,12	 %
+0000034f : 00008067;   % 1275: 	ret %
+00000350 : 00100293;   % 1280: 	 li t0,1 %
+00000351 : 02550663;   % 1281: 	 beq a0, t0,alliesLevel1  #checa se a0=1 %
+00000352 : 00128293;   % 1282: 	 addi t0,t0,1 %
+00000353 : 02550863;   % 1283: 	 beq a0,t0,alliesLevel2 #checa se a0=2 %
+00000354 : 00128293;   % 1284: 	 addi t0,t0,1 %
+00000355 : 02550663;   % 1285: 	 beq a0,t0,alliesLevel3 #checa se a0=3 %
+00000356 : 00128293;   % 1286: 	 addi t0,t0,1 %
+00000357 : 02550463;   % 1287: 	 beq a0,t0,alliesLevel4 #checa se a0=4 %
+00000358 : 00128293;   % 1288: 	 addi t0,t0,1 %
+00000359 : 02550263;   % 1289: 	 beq a0,t0,alliesLevel5 #checa se a0=5 %
+0000035a : fff00513;   % 1290: 	 li a0,-1 %
+0000035b : 00008067;   % 1291: 	 ret %
+0000035c : 0fc0f517;   % 1294: 	la a0,allies_fase1 %
+0000035d : 7dc50513;   % 1294:  %
+0000035e : 00008067;   % 1295: 	ret %
+0000035f : 00008067;   % 1298: 	ret %
+00000360 : 00008067;   % 1301: 	ret %
+00000361 : 00008067;   % 1304: 	ret %
+00000362 : 00008067;   % 1307: 	ret %
+00000363 : 00100293;   % 1310: 	 li t0,1 %
+00000364 : 02550663;   % 1311: 	 beq a0, t0,enemiesLevel1  #checa se a0=1 %
+00000365 : 00128293;   % 1312: 	 addi t0,t0,1 %
+00000366 : 02550863;   % 1313: 	 beq a0,t0,enemiesLevel2 #checa se a0=2 %
+00000367 : 00128293;   % 1314: 	 addi t0,t0,1 %
+00000368 : 02550663;   % 1315: 	 beq a0,t0,enemiesLevel3 #checa se a0=3 %
+00000369 : 00128293;   % 1316: 	 addi t0,t0,1 %
+0000036a : 02550463;   % 1317: 	 beq a0,t0,enemiesLevel4 #checa se a0=4 %
+0000036b : 00128293;   % 1318: 	 addi t0,t0,1 %
+0000036c : 02550263;   % 1319: 	 beq a0,t0,enemiesLevel5 #checa se a0=5 %
+0000036d : fff00513;   % 1320: 	 li a0,-1 %
+0000036e : 00008067;   % 1321: 	 ret %
+0000036f : 0fc0f517;   % 1324: 	la a0,enemies_fase1 %
+00000370 : 79550513;   % 1324:  %
+00000371 : 00008067;   % 1325: 	ret %
+00000372 : 00008067;   % 1328: 	ret %
+00000373 : 00008067;   % 1331: 	ret %
+00000374 : 00008067;   % 1334: 	ret %
+00000375 : 00008067;   % 1337: 	ret %
+00000376 : 00100293;   % 1340: 	 li t0,1 %
+00000377 : 02550663;   % 1341: 	 beq a0, t0,mapLevel1  #checa se a0=1 %
+00000378 : 00228293;   % 1342: 	 addi t0,t0,2 %
+00000379 : 02550863;   % 1343: 	 beq a0,t0,mapLevel2 #checa se a0=2 %
+0000037a : 00328293;   % 1344: 	 addi t0,t0,3 %
+0000037b : 02550663;   % 1345: 	 beq a0,t0,mapLevel3 #checa se a0=3 %
+0000037c : 00428293;   % 1346: 	 addi t0,t0,4 %
+0000037d : 02550463;   % 1347: 	 beq a0,t0,mapLevel4 #checa se a0=4 %
+0000037e : 00528293;   % 1348: 	 addi t0,t0,5 %
+0000037f : 02550263;   % 1349: 	 beq a0,t0,mapLevel5 #checa se a0=5 %
+00000380 : fff00513;   % 1350: 	 li a0,-1 %
+00000381 : 00008067;   % 1351: 	 ret %
+00000382 : 0fc0f517;   % 1354: 	la a0,Mapa_fase1 %
+00000383 : 61850513;   % 1354:  %
+00000384 : 00008067;   % 1355: 	ret %
+00000385 : 00008067;   % 1358: 	ret %
+00000386 : 00008067;   % 1361: 	ret %
+00000387 : 00008067;   % 1364: 	ret %
+00000388 : 00008067;   % 1367: 	ret %
+00000389 : ff010113;   % 1371: 	addi sp,sp, -16 %
+0000038a : 00912023;   % 1372: 	sw s1,0(sp) %
+0000038b : 01212223;   % 1373: 	sw s2,4(sp) %
+0000038c : 01312423;   % 1374: 	sw s3,8(sp) %
+0000038d : 01412623;   % 1375: 	sw s4,12(sp) %
+0000038e : 00a004b3;   % 1377: 	mv s1,a0	# s1 = endereco inicial do arquivo de mapa %
+0000038f : 12c00913;   % 1379: 	li s2, 300	# s2 = quantidade de bytes por arquivos de mapa %
+00000390 : 00a90933;   % 1380: 	add s2,s2,a0 	# s2 =  endereco final do arquivo de mapa %
+00000391 : 00000993;   % 1381: 	li s3, 0	# s3 = contador utilizado para posições %
+00000392 : 14000a13;   % 1382: 	li s4,320	# s4 = numero utilizado em contas  %
+00000393 : 00b006b3;   % 1383: 	mv a3, a1	# coloca em a3 o endereco da frame para ser utilizado peloi drawImage 	 %
+00000394 : 05248663;   % 1386: 	beq s1,s2,printMapEnd 	# checa condicao de parada %
+00000395 : 00900533;   % 1387: 	mv a0,s1	 %
+00000396 : 00050503;   % 1388: 	lb a0,0(a0) %
+00000397 : ffc10113;   % 1390: 	addi sp,sp,-4 %
+00000398 : 00112023;   % 1391: 	sw ra,0(sp) %
+00000399 : 03c000ef;   % 1393: 	jal getTile 		# armazena endereco do tile em a0 %
+0000039a : 00012083;   % 1395: 	lw ra,0(sp) %
+0000039b : 00410113;   % 1396: 	addi sp,sp,4 %
+0000039c : 0349e5b3;   % 1399: 	rem a1,s3,s4		# a1 = coord_x %
+0000039d : 0349c633;   % 1400: 	div a2,s3,s4		 %
+0000039e : 00461613;   % 1401: 	slli a2,a2,4		# a2 = coord_y %
+0000039f : ffc10113;   % 1403: 	addi sp,sp,-4 %
+000003a0 : 00112023;   % 1404: 	sw ra,0(sp) %
+000003a1 : 098000ef;   % 1406: 	jal drawImage 		#pinta character %
+000003a2 : 00012083;   % 1408: 	lw ra,0(sp) %
+000003a3 : 00410113;   % 1409: 	addi sp,sp,4 %
+000003a4 : 00148493;   % 1412: 	addi s1,s1,1 %
+000003a5 : 01098993;   % 1413: 	addi s3,s3,16 %
+000003a6 : fb9ff06f;   % 1414: 	j printMapLoop %
+000003a7 : 00008067;   % 1417: 	ret %
+000003a8 : 00100293;   % 1422: 	li t0,1 %
+000003a9 : 00550a63;   % 1423: 	beq a0,t0,grassTile %
+000003aa : 00128293;   % 1424: 	addi t0,t0,1 %
+000003ab : 00550c63;   % 1425: 	beq a0,t0,bushTile %
+000003ac : fff00513;   % 1426: 	li a0,-1 %
+000003ad : 00008067;   % 1427: 	ret %
+000003ae : 0fc0f517;   % 1429: 	la a0, Grass %
+000003af : 35850513;   % 1429:  %
+000003b0 : 00008067;   % 1430: 	ret %
+000003b1 : 0fc0f517;   % 1432: 	la a0,Bush %
+000003b2 : 13c50513;   % 1432:  %
+000003b3 : 00008067;   % 1433: 	ret %
+000003b4 : ff200337;   % 1443: 	li t1, 0xFF200000	# Carrega o endereco de status do KDMMIO %
+000003b5 : 00030313;   % 1443:  %
+000003b6 : 00032283;   % 1445: 	lw t0, 0(t1)		# Carrega o status do teclado %
+000003b7 : 0012f293;   % 1446: 	andi t0, t0, 0x0001	# Mascara o bit menos significativo. %
+000003b8 : fe028ce3;   % 1447: 	beq t0, zero, rkb_loop	# Se nao houver tecla pressionada repete ate que o usuario aperte algo %
+000003b9 : 00432503;   % 1448: 	lw a0, 4(t1)		# Carrega o caractere que foi pressionado %
+000003ba : 00a32623;   % 1449: 	sw a0, 12(t1)		# Escreve o caractere lido no display  %
+000003bb : 00008067;   % 1450: 	ret	 %
+000003bc : 00a00893;   % 1453: 	li a7, 10 %
+000003bd : 00000073;   % 1454: 	ecall %
+000003be : ff200337;   % 1464: 	li t1, 0xFF200000	# Carrega o endereço de status do KDMMIO %
+000003bf : 00030313;   % 1464:  %
+000003c0 : 00032283;   % 1465: 	lw t0, 0(t1)		# Carrega o status do teclado %
+000003c1 : 0012f293;   % 1466: 	andi t0, t0, 0x0001	# Mascara o bit menos significativo %
+000003c2 : 00028863;   % 1467: 	beq t0, zero, rknb_end	# Se não houver tecla pressionada continua %
+000003c3 : 00432383;   % 1468: 	lw t2, 4(t1)		# Carrega o caractere que foi pressionado %
+000003c4 : 00432503;   % 1469: 	lw a0, 4(t1)		# Carrega em a0 (vari?vel de retorno) o caractere %
+000003c5 : 00732623;   % 1470: 	sw t2, 12(t1)		# Escreve o caractere lido no display %
+000003c6 : 00008067;   % 1472: 	ret			#retorna  %
+000003c7 : 00052283;   % 1478: 	lw t0,0(a0)	# t0 armazena largura da imagem %
+000003c8 : 00452303;   % 1479: 	lw t1,4(a0)	# t1 armazena altura da imagem %
+000003c9 : 14000393;   % 1481: 	li t2,320 %
+000003ca : 027603b3;   % 1482: 	mul t2,a2,t2 %
+000003cb : 00b383b3;   % 1483: 	add t2,t2,a1 %
+000003cc : 00d383b3;   % 1484: 	add t2,t2,a3	# t2 armazena endereco inicial/atual da área de pintura %
+000003cd : 14000e13;   % 1486: 	li t3,320 %
+000003ce : 026e0e33;   % 1487: 	mul t3,t3,t1 %
+000003cf : 005e0e33;   % 1488: 	add t3,t3,t0 %
+000003d0 : 007e0e33;   % 1489: 	add t3,t3,t2 	# t3 armazena enderço final da área de pintura %
+000003d1 : ec0e0e13;   % 1490: 	addi t3,t3,-320 %
+000003d2 : 00850513;   % 1492: 	addi a0,a0,8	# muda a0 para o endereço inicial das cores %
+000003d3 : 00000f13;   % 1493: 	li t5,0 	# t5 é um marcador de passos à direita %
+000003d4 : 0c700e93;   % 1494: 	li t4, 0xC7 %
+000003d5 : 03c38863;   % 1497: 	beq t2,t3,finishDraw # se endereço atual = endereço final, finaliza pintura %
+000003d6 : 005f1863;   % 1498: 	bne t5,t0, keepDraw %
+000003d7 : 14038393;   % 1500: 	addi t2,t2,320		#muda t2 para primeira posição da linha debaixo %
+000003d8 : 405383b3;   % 1501: 	sub t2,t2,t0	 %
+000003d9 : 00000f33;   % 1502: 	add t5,zero,zero %
+000003da : 00050f83;   % 1504: 	lb t6,(a0) # t6 carrega coloração do pixel %
+000003db : 01fe8463;   % 1505: 	beq t4,t6,transparent %
+000003dc : 01f38023;   % 1506: 	sb t6,0(t2) %
+000003dd : 00138393;   % 1508: 	addi t2,t2,1  # muda para póximo endereço %
+000003de : 001f0f13;   % 1509: 	addi t5,t5,1  #passa o contador de passos para a direita %
+000003df : 00150513;   % 1510: 	addi a0,a0,1 %
+000003e0 : fd5ff06f;   % 1511: 	j drawLoop %
+000003e1 : 00008067;   % 1513: 	ret %
+000003e2 : 00000293;   % 1516: 	li t0,0  	# iterador para altura %
+000003e3 : 02e28c63;   % 1518: 	beq t0,a4,endDrawSquare %
+000003e4 : 00000313;   % 1519: 	li t1,0		# iterador para largura %
+000003e5 : 02d30463;   % 1521: 	beq t1,a3,endInnerLoop  %
+000003e6 : 00b303b3;   % 1523: 	add t2,t1,a1  	# t2 = pos_x do ponto %
+000003e7 : 00c28e33;   % 1524: 	add t3,t0,a2	# t3 = pos_y do ponto %
+000003e8 : 00f383b3;   % 1526: 	add t2,t2,a5 %
+000003e9 : 14000e93;   % 1528: 	li t4,320 %
+000003ea : 03ce8e33;   % 1529: 	mul t3, t4,t3	 %
+000003eb : 007e0e33;   % 1531: 	add t3,t3,t2	# t3 = endereco na memoria %
+000003ec : 00ae0023;   % 1533: 	sb a0,(t3) %
+000003ed : 00130313;   % 1535: 	addi t1,t1,1 %
+000003ee : fddff06f;   % 1536: 	j drawSquareInnerLoop %
+000003ef : 00128293;   % 1538: 	addi t0,t0,1 %
+000003f0 : fcdff06f;   % 1539: 	j drawSquareOutterLoop %
+000003f1 : 00008067;   % 1541: 	ret %
+000003f2 : ff810113;   % 1554: 		addi	sp, sp, -8			# aloca espaco %
+000003f3 : 00112023;   % 1555:     		sw	ra, 0(sp)			# salva ra %
+000003f4 : 00812223;   % 1556:     		sw	s0, 4(sp)			# salva s0 %
+000003f5 : 00a00433;   % 1557:     		mv	s0, a0              		# s0 = endereco do caractere na string %
+000003f6 : 00040503;   % 1559: loopprintString:lb	a0, 0(s0)                 	# le em a0 o caracter a ser impresso %
+000003f7 : 02050263;   % 1561:     		beq     a0, zero, fimloopprintString	# string ASCIIZ termina com NULL %
+000003f8 : 030000ef;   % 1563:     		jal     printChar       		# imprime char %
+000003f9 : 00858593;   % 1565: 		addi    a1, a1, 8                 	# incrementa a coluna %
+000003fa : 13900f93;   % 1566: 		li 	t6, 313		 %
+000003fb : 01f5c663;   % 1567: 		blt	a1, t6, NaoPulaLinha	    	# se ainda tiver lugar na linha %
+000003fc : 00860613;   % 1568:     		addi    a2, a2, 8                 	# incrementa a linha %
+000003fd : 000005b3;   % 1569:     		mv    	a1, zero			# volta a coluna zero %
+000003fe : 00140413;   % 1571: NaoPulaLinha:	addi    s0, s0, 1			# proximo caractere %
+000003ff : fddff06f;   % 1572:     		j       loopprintString       		# volta ao loop %
+00000400 : 00012083;   % 1574: fimloopprintString:	lw      ra, 0(sp)    		# recupera ra %
+00000401 : 00412403;   % 1575: 			lw 	s0, 4(sp)		# recupera s0 original %
+00000402 : 00810113;   % 1576:     			addi    sp, sp, 8		# libera espaco %
+00000403 : 00008067;   % 1577: fimprintString:	ret      	    			# retorna %
+00000404 : ffc10113;   % 1600: 		addi sp,sp,-4 %
+00000405 : 01912023;   % 1601: 		sw s9,0(sp) %
+00000406 : 0ff00e93;   % 1603: 		li 	t4, 0xFF	# t4 temporario %
+00000407 : 008e9e93;   % 1604: 		slli 	t4, t4, 8	# t4 = 0x0000FF00 (no RARS, nao podemos fazer diretamente "andi rd, rs1, 0xFF00") %
+00000408 : 01d6ff33;   % 1605: 		and    	t5, a3, t4   	# t5 obtem cor de fundo %
+00000409 : 008f5f13;   % 1606:     		srli	t5, t5, 8	# numero da cor de fundo %
+0000040a : 0ff6ff93;   % 1607: 		andi   	t6, a3, 0xFF    # t6 obtem cor de frente %
+0000040b : 02000213;   % 1609: 		li 	tp, ' ' %
+0000040c : 00454863;   % 1610: 		blt 	a0, tp, printChar.NAOIMPRIMIVEL	# ascii menor que 32 nao eh imprimivel %
+0000040d : 07e00213;   % 1611: 		li 	tp, '~' %
+0000040e : 00a24463;   % 1612: 		bgt	a0, tp, printChar.NAOIMPRIMIVEL	# ascii Maior que 126  nao eh imprimivel %
+0000040f : 0080006f;   % 1613:     		j       printChar.IMPRIMIVEL %
+00000410 : 02000513;   % 1615: printChar.NAOIMPRIMIVEL: li      a0, 32		# Imprime espaco %
+00000411 : 14000213;   % 1617: printChar.IMPRIMIVEL:	li	tp, 320		# Num colunas 320 %
+00000412 : 02c20eb3;   % 1618: 			mul t4,tp,a2 %
+00000413 : 0080006f;   % 1619: 			j printChar.mul1d %
+00000414 : 02c20eb3;   % 1620: printChar.mul1:		mul     t4, tp, a2			# multiplica a2x320  t4 = coordenada y %
+00000415 : 00be8eb3;   % 1621: printChar.mul1d:	add     t4, t4, a1               	# t4 = 320*y + x %
+00000416 : 007e8e93;   % 1622: 			addi    t4, t4, 7                 	# t4 = 320*y + (x+7) %
+00000417 : ff000237;   % 1623: 			li      tp, 0xFF000000          	# Endereco de inicio da memoria VGA0 %
+00000418 : 00020213;   % 1623:  %
+00000419 : 00070663;   % 1624: 			beq 	a4, zero, printChar.PULAFRAME		# Verifica qual o frame a ser usado em a4 %
+0000041a : ff100237;   % 1625: 			li      tp, 0xFF100000          	# Endereco de inicio da memoria VGA1 %
+0000041b : 00020213;   % 1625:  %
+0000041c : 004e8eb3;   % 1626: printChar.PULAFRAME:	add     t4, t4, tp               	# t4 = endereco de impressao do ultimo pixel da primeira linha do char %
+0000041d : fe050393;   % 1627: 			addi    t2, a0, -32               	# indice do char na memoria %
+0000041e : 00339393;   % 1628: 			slli    t2, t2, 3                 	# offset em bytes em relacao ao endereco inicial %
+0000041f : 0fc10e17;   % 1629: 			la      t3, LabelTabChar		# endereco dos caracteres na memoria %
+00000420 : a2ce0e13;   % 1629:  %
+00000421 : 01c383b3;   % 1630: 			add     t2, t2, t3               	# endereco do caractere na memoria %
+00000422 : 0003ae03;   % 1631: 			lw      t3, 0(t2)                 	# carrega a primeira word do char %
+00000423 : 00400293;   % 1632: 			li 	t0, 4				# i=4 %
+00000424 : 02028e63;   % 1634: printChar.forChar1I:	beq     t0, zero, printChar.endForChar1I # if(i == 0) end for i %
+00000425 : 00800313;   % 1635:     			addi    t1, zero, 8               	# j = 8 %
+00000426 : 02030463;   % 1637: printChar.forChar1J:	beq     t1, zero, printChar.endForChar1J # if(j == 0) end for j %
+00000427 : 001e7c93;   % 1638:         		andi    s9, t3, 0x001			# primeiro bit do caracter %
+00000428 : 001e5e13;   % 1639:         		srli    t3, t3, 1             		# retira o primeiro bit %
+00000429 : 000c8663;   % 1640:         		beq     s9, zero, printChar.printCharPixelbg1	# pixel eh fundo? %
+0000042a : 01fe8023;   % 1641:         		sb      t6, 0(t4)             		# imprime pixel com cor de frente %
+0000042b : 0080006f;   % 1642:         		j       printChar.endCharPixel1 %
+0000042c : 01ee8023;   % 1643: printChar.printCharPixelbg1:	sb      t5, 0(t4)                # imprime pixel com cor de fundo %
+0000042d : fff30313;   % 1644: printChar.endCharPixel1: addi    t1, t1, -1                	# j-- %
+0000042e : fffe8e93;   % 1645:     			addi    t4, t4, -1                	# t4 aponta um pixel para a esquerda %
+0000042f : fddff06f;   % 1646:     			j       printChar.forChar1J		# vollta novo pixel %
+00000430 : fff28293;   % 1648: printChar.endForChar1J: addi    t0, t0, -1 		# i-- %
+00000431 : 148e8e93;   % 1649:     			addi    t4, t4, 328           	# 2**12 + 8 %
+00000432 : fc9ff06f;   % 1650:     			j       printChar.forChar1I	# volta ao loop %
+00000433 : 0043ae03;   % 1652: printChar.endForChar1I:	lw      t3, 4(t2)           	# carrega a segunda word do char %
+00000434 : 00400293;   % 1653: 			li 	t0, 4			# i = 4 %
+00000435 : 02028e63;   % 1654: printChar.forChar2I:    beq     t0, zero, printChar.endForChar2I  # if(i == 0) end for i %
+00000436 : 00800313;   % 1655:     			addi    t1, zero, 8             # j = 8 %
+00000437 : 02030463;   % 1657: printChar.forChar2J:	beq	t1, zero, printChar.endForChar2J # if(j == 0) end for j %
+00000438 : 001e7c93;   % 1658:         		andi    s9, t3, 0x001	    		# pixel a ser impresso %
+00000439 : 001e5e13;   % 1659:         		srli    t3, t3, 1                 	# desloca para o proximo %
+0000043a : 000c8663;   % 1660:         		beq     s9, zero, printChar.printCharPixelbg2 # pixel eh fundo? %
+0000043b : 01fe8023;   % 1661:         		sb      t6, 0(t4)			# imprime cor frente %
+0000043c : 0080006f;   % 1662:         		j       printChar.endCharPixel2		# volta ao loop %
+0000043d : 01ee8023;   % 1664: printChar.printCharPixelbg2:	sb      t5, 0(t4)		# imprime cor de fundo %
+0000043e : fff30313;   % 1666: printChar.endCharPixel2:	addi    t1, t1, -1		# j-- %
+0000043f : fffe8e93;   % 1667:     				addi    t4, t4, -1              # t4 aponta um pixel para a esquerda %
+00000440 : fddff06f;   % 1668:     				j       printChar.forChar2J %
+00000441 : fff28293;   % 1670: printChar.endForChar2J:	addi	t0, t0, -1 		# i-- %
+00000442 : 148e8e93;   % 1671:     			addi    t4, t4, 328		# %
+00000443 : fc9ff06f;   % 1672:     			j       printChar.forChar2I	# volta ao loop %
+00000444 : 00012c83;   % 1675: 			lw s9,0(sp) %
+00000445 : 00410113;   % 1676: 			addi sp,sp,4 %
+00000446 : 00008067;   % 1678: 			ret	 %
+END;
