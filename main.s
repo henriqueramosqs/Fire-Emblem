@@ -8,12 +8,26 @@
 	
 	#mapas
 	.include "maps/Mapa_fase1.data"
+	.include "maps/Mapa_fase2.data"
+	.include "maps/Mapa_fase3.data"
+	.include "maps/Mapa_fase4.data"
+	.include "maps/Mapa_fase5.data"
 	
 	#allies
 	.include "allies/allies_fase1.data"
+	.include "allies/allies_fase2.data"
+	.include "allies/allies_fase3.data"
+	.include "allies/allies_fase4.data"
+	.include "allies/allies_fase5.data"
+			
 	
 	#enemies
 	.include "enemies/enemies_fase1.data"
+	.include "enemies/enemies_fase2.data"
+	.include "enemies/enemies_fase3.data"
+	.include "enemies/enemies_fase4.data"
+	.include "enemies/enemies_fase5.data"
+	
 	
 	#sprites
 	.include "images_data/Hero.data"
@@ -26,7 +40,7 @@
 	.include "images_data/Enemy_left.data"
 	.include "images_data/Hero_right.data"
 	.include "images_data/Enemy_right.data"
-		
+
 	#others
 	.include "images_data/computer.data"
 	.include "images_data/calculator.data"
@@ -89,7 +103,7 @@
 	lw a5,frame_one
 	jal drawSquare
 	
-	li a0,1
+	li a0,5
 StartLevel:	#recebe em a0 o número da fase, efetua os proicedimentos necessários
 		
 		#<procedimento_de_rodar_história>
@@ -1480,16 +1494,16 @@ alliesLevel1:
 	la a0,allies_fase1
 	ret
 alliesLevel2:
-	#la a0,allies_fase2
+	la a0,allies_fase2
 	ret
 alliesLevel3:	
-	#la a0,allies_fase3
+	la a0,allies_fase3
 	ret
 alliesLevel4:
-	#la a0,allies_fase4
+	la a0,allies_fase4
 	ret
 alliesLevel5:
-	#la a0,allies_fase5
+	la a0,allies_fase5
 	ret
 	
 getEnemies:	#recebe em a0 o numero da fase, retorna o endereco do arquivo de enemies correspondente ou -1 caso nao encontrado li t0,1
@@ -1510,28 +1524,28 @@ enemiesLevel1:
 	la a0,enemies_fase1
 	ret
 enemiesLevel2:
-	#la a0,enemies_fase2
+	la a0,enemies_fase2
 	ret
 enemiesLevel3:	
-	#la a0,enemies_fase3
+	la a0,enemies_fase3
 	ret
 enemiesLevel4:
-	#la a0,enemies_fase4
+	la a0,enemies_fase4
 	ret
 enemiesLevel5:
-	#la a0,enemies_fase5
+	la a0,enemies_fase5
 	ret
 		
 getLevelMap: # recebe em a0 numero da fase, retorna em a0 o endereco do mapa ou -1 se mapa da fase nao foi encontrado
 	 li t0,1
 	 beq a0, t0,mapLevel1  #checa se a0=1
-	 addi t0,t0,2
+	 addi t0,t0,1
 	 beq a0,t0,mapLevel2 #checa se a0=2
-	 addi t0,t0,3
+	 addi t0,t0,1
 	 beq a0,t0,mapLevel3 #checa se a0=3
-	 addi t0,t0,4
+	 addi t0,t0,1
 	 beq a0,t0,mapLevel4 #checa se a0=4
-	 addi t0,t0,5
+	 addi t0,t0,1
 	 beq a0,t0,mapLevel5 #checa se a0=5
 	 li a0,-1
 	 ret
@@ -1540,16 +1554,16 @@ mapLevel1:
 	la a0,Mapa_fase1
 	ret
 mapLevel2:
-	#la a0,Mapa_fase2
+	la a0,Mapa_fase2
 	ret
 mapLevel3:	
-	#la a0,Mapa_fase3
+	la a0,Mapa_fase3
 	ret
 mapLevel4:
-	#la a0,Mapa_fase4
+	la a0,Mapa_fase4
 	ret
 mapLevel5:
-	#la a0,Mapa_fase5
+	la a0,Mapa_fase5
 	ret
 	
 printMap:		# :void, recebe em a0  o endereco do arquivo do mapa e em a1 o endereco da frame, pinta o mapa na tela
