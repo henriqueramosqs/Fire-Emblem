@@ -12,6 +12,9 @@
 	.include "images_data/HalfHeart.data"
 	.include "images_data/HighlightedHalfHeart.data"
 	
+	.include "images_data/Wall.data"
+	.include "images_data/HighlightedWall.data"
+	
 	#mapas
 	.include "maps/Mapa_fase1.data"
 	.include "maps/Mapa_fase2.data"
@@ -57,6 +60,9 @@
 	.include "images_data/Enemy_background.data"
 	.include "images_data/life_bar.data"
 	
+	#extra 
+	.include "images_data/lamarBombado.data"
+	
 	#strings da historia
 	fase_0_nome: .string "Introducao"
 	fase_1_nome: .string "TP1"
@@ -66,20 +72,20 @@
 	fase_5_nome: .string "OAC"
 	fase_6_nome: .string "Parabens! voce tankou o semestre"
 	
-	fase_0_hist1 : .string "No final de um belo dia, o sol se escureceu e apareceu uma terrivel praga e fomos obrigados a ficar trancados em bunkers se quisessemos sobreviver. Agora, podemos finalmente sair de nossos abrigos e encontrar outras pessoas. Infelizmente, toda felicidade dura pouco, e uma nova ameaca surgiu. A terra se abriu e inumeras criaturas de outra dimensao apareceram, elas atacam e rasgam as pessoas inofensivas. Por isso, eu entrei na ordem de guerreiros do lado oeste da cidade"
-	fase_0_hist2: .string "Meu nome eh Violet, cresci dentro dos muros desta cidade, treinando no subsolo  e fui criada para sobreviver. Pode se dizer que esperei por esse momento, pois foram 2  anos vivendo em um mundo sombrio, onde havia apenas noite, fumaca e miseria. Agora apos esse periodo, saindo de nossas casas temos que enfrentar algumas ondas diferentes de feras que estao dispostas a nos derrotar a qualquer custo \n -Violet"
-	fase_1_hist1: .string "Bem vinda de volta a civilidade!  Agora voce vai encarar alguns desafios que vão exigir sua forca e capacidade para resolve-los. Os inimigos dessa onda exigiram de voce as tecnicas de programacão que voce aprendeu quando estava reclusa no bunker, mas estarei aqui para lutar ao seu lado! \n Prof.Roberta"
-	fase_1_hist2: .string "Obrigada professora, eu sei que posso contar contigo nessa jornada. \n Violet"
-	fase_2_hist1: .string "Ohh nao! Não sei se irei conseguir enfrentar todas essas feras numericas com “formulas” estranhas sozinha.\n Violet"
-	fase_2_hist2: .string "Nao tema, garota! Estou aqui para te ajudar com essas criaturas. Mostrarei para elas o poder do trabalinho. \n - Professor substituto  "
-	fase_3_hist1: .string "Aghh! Estou tentando calcular a probabilidade de sobreviver a essa jornada, mas nao sei se realmente irei conseguir… \n -Violet"
-	fase_3_hist2: .string "Nao desanime, minha cara. Com a minha ajuda voce ira ver que voce ainda tem chances de vencer as proximas criaturas. \n -Formulario"
-	fase_4_hist1: .string "Estou em uma fase que nao posso gastar todas as minhas energias, a proxima fase eh horrivel.. \n -Violet"
-	fase_4_hist2: .string "Eu estou aqui do seu lado, não se preocupe com nada mais, poupe suas energias garota \n - Testinhos"
-	fase_5_hist1: .string  "Se voce chegou ate aqui e porque consegue vencer essa fase, eu confio na sua capacidade, aqui nao importa quantos inimigos voce tenha o maior de todos eh o Patterson! \n -Lamar"
-	fase_5_hist2: .string  "Muito obrigada pelo seu auxilio mestre Lamar, sei que com sua ajuda eu vou conseguir vencer esses inimigos.\n - Violet"
-	fase_6_hist1: .string  "Muito obrigada Mestre. Sem sua ajuda eu nunca teria chegado no final!\n -Violet"
-	fase_6_hist2: .string  "De nada! Desejo toda sorte de agora em diante \n -Lamar."
+	fase_0_hist1 : .string "Violet: No final de um belo dia, o sol se escureceu e apareceu uma terrivel praga e fomos obrigados a ficar trancados em bunkers se quisessemos sobreviver. Agora, podemos finalmente sair de nossos abrigos e encontrar outras pessoas. Infelizmente, toda felicidade dura pouco, e uma nova ameaca surgiu. A terra se abriu e inumeras criaturas de outra dimensao apareceram, elas atacam e rasgam as pessoas inofensivas. Por isso, eu entrei na ordem de guerreiros do lado oeste da cidade"
+	fase_0_hist2: .string "Violet: Meu nome eh Violet, cresci dentro dos muros desta cidade, treinando no subsolo  e fui criada para sobreviver. Pode se dizer que esperei por esse momento, pois foram 2  anos vivendo em um mundo sombrio, onde havia apenas noite, fumaca e miseria. Agora apos esse periodo, saindo de nossas casas temos que enfrentar algumas ondas diferentes de feras que estao dispostas a nos derrotar a qualquer custo"
+	fase_1_hist1: .string "Prof.Roberta: Bem vinda de volta a civilidade!  Agora voce vai encarar alguns desafios que vão exigir sua forca e capacidade para resolve-los. Os inimigos dessa onda exigiram de voce as tecnicas de programacão que voce aprendeu quando estava reclusa no bunker, mas estarei aqui para lutar ao seu lado!"
+	fase_1_hist2: .string "Violet: Obrigada professora, eu sei que posso contar contigo nessa jornada."
+	fase_2_hist1: .string "Violet: Ohh nao! Não sei se irei conseguir enfrentar todas essas feras numericas com “formulas” estranhas sozinha."
+	fase_2_hist2: .string "Professor substituto: Nao tema, garota! Estou aqui para te ajudar com essas criaturas. Mostrarei para elas o poder do trabalinho."
+	fase_3_hist1: .string "Violet: Aghh! Estou tentando calcular a probabilidade de sobreviver a essa jornada, mas nao sei se realmente irei conseguir…"
+	fase_3_hist2: .string "Formulario: Nao desanime, minha cara. Com a minha ajuda voce ira ver que voce ainda tem chances de vencer as proximas criaturas."
+	fase_4_hist1: .string "Violet: Estou em uma fase que nao posso gastar todas as minhas energias, a proxima fase eh horrivel..."
+	fase_4_hist2: .string "Testinhos: Eu estou aqui do seu lado, não se preocupe com nada mais, poupe suas energias garota"
+	fase_5_hist1: .string  "Lamar: Se voce chegou ate aqui e porque consegue vencer essa fase, eu confio na sua capacidade, aqui nao importa quantos inimigos voce tenha o maior de todos eh o Patterson!"
+	fase_5_hist2: .string  "Violet: Muito obrigada pelo seu auxilio mestre Lamar, sei que com sua ajuda eu vou conseguir vencer esses inimigos"
+	fase_6_hist1: .string  "Violet: Muito obrigada Mestre. Sem sua ajuda eu nunca teria chegado no final!"
+	fase_6_hist2: .string  "Lamar: De nada! Desejo toda sorte de agora em diante."
 	
 	#Cores
 	menu_blue: .byte 155 
@@ -136,14 +142,6 @@
 	
 	li a0,0
 	jal runHistory
-	
-	li a0,0
-	li a1,0
-	li a2,20
-	li a3,320
-	li a4,200
-	lw a5,frame_zero
-	jal drawSquare
 	
 	li a0,1
 	
@@ -429,6 +427,7 @@ confirmChangePosition:
 	jal getCharacterByCoordinate	#muda posicao do personagem no arquivo
 	sb s0,0(a0)
 	sb s1,1(a0)
+	mv a7,a0	# a7 marca o endereco do personagem que esta sendo movido (usado caso haja interrupcao de paredes)
 	
 	li a0,0
 	mv a1,s9
@@ -462,7 +461,7 @@ enhanceHalfHeart:
 	addi t0,t0,3
 	
 	li t1,10
-	bgt t1,t0,enhanceFullHeart
+	bgt t0,t1,enhanceFullHeart
 	sb t0,2(a0)
 	j finishConfirmChangePosition
 	
@@ -505,6 +504,20 @@ moveToRight.loop:
 	jal resetMapPosition
 	
 	addi s0,s0,1
+	mv a0,s0
+	mv a1,a1
+	jal getTileCode
+	li t0,5
+	bne a0,t0,keepMoveToRight.loop
+	addi s0,s0,-1
+	mv s3,s0
+	mv s1,s2
+	sb s0,0(a7)
+	sb s1,1(a7)
+	sw s0,8(sp)
+	sw s1,12(sp)
+	j endAnimateMovement
+keepMoveToRight.loop:	
 	mv a0,s6
 	slli a1,s0,4	
 	slli a2,s2,4
@@ -529,6 +542,21 @@ moveToLeft.loop:
 	jal resetMapPosition
 	
 	addi s0,s0,-1
+	
+	mv a0,s0
+	mv a1,a1
+	jal getTileCode
+	li t0,5
+	bne a0,t0,keepMoveToLeft.loop
+	addi s0,s0,1
+	mv s3,s0
+	mv s1,s2
+	sb s0,0(a7)
+	sb s1,1(a7)
+	sw s0,8(sp)
+	sw s1,12(sp)
+	j endAnimateMovement
+keepMoveToLeft.loop:	
 	mv a0,s6
 	slli a1,s0,4	
 	slli a2,s2,4
@@ -560,6 +588,21 @@ moveUpwards.loop:
 	jal resetMapPosition
 	
 	addi s0,s0,-1
+	
+	mv a0,s1
+	mv a1,s0
+	jal getTileCode
+	li t0,5
+	bne a0,t0,keepMoveUpwards.loop
+	addi s0,s0,1
+	sb s1,0(a7)
+	sb s0,1(a7)
+	sw s0,8(sp)
+	sw s1,12(sp)
+	mv s3,s1
+	mv s1,s0
+	j endAnimateMovement
+keepMoveUpwards.loop:
 	mv a0,s6
 	slli a1,s3,4	
 	slli a2,s0,4
@@ -585,6 +628,37 @@ moveDownwards.loop:
 	jal resetMapPosition
 	
 	addi s0,s0,+1
+	
+	mv a0,s1
+	mv a1,s0
+	jal getTileCode
+	li t0,5
+	bne a0,t0,keepMoveDownwards.loop
+	addi s0,s0,-1
+	sb s1,0(a7)
+	sb s0,1(a7)
+	sw s0,8(sp)
+	sw s1,12(sp)
+	mv s3,s1
+	mv s1,s0
+	j endAnimateMovement
+keepMoveDownwards.loop:
+	
+	mv a0,s1
+	mv a1,s0
+	jal getTileCode
+	li t0,5
+	bne a0,t0,keepMoveDownards.loop
+	addi s0,s0,1
+	mv s3,s0
+	mv s1,s2
+	sb s1,0(a7)
+	sb s0,1(a7)
+	sw s0,8(sp)
+	sw s1,12(sp)
+	j endAnimateMovement
+keepMoveDownards.loop:
+
 	mv a0,s6
 	slli a1,s3,4	
 	slli a2,s0,4
@@ -845,8 +919,9 @@ LeftMenuChosen:
 AuxiliarBattleScreen_Left:
 	jal getFightersAdresses
 	li t0,-1
-	beq a1,t0,FinishRightMenu
+	beq a1,t0,FinishLeftMenu
 	
+	jal ChooseWeapon
 	jal OpenBattleScreen
 	
 	mv a0,s11
@@ -867,12 +942,51 @@ FinishLeftMenu:
 	addi sp,sp,4
 	ret
 
+ChooseWeapon:
+	lb t1,3(a0)
+	lb t2,3(a1)
+	li t3,1
+	li t4,2
+	
+	beq t1,zero,HeroComputer
+	beq t1,t3,HeroCalculator
+	beq t1,t4,HeroPencil
+	
+HeroComputer:
+	bne t2,zero,TestCalculator1
+	li a2, 6
+	ret
+TestCalculator1:	bne t2,t3,TestPencil1
+	li a2, 12
+	ret
+TestPencil1:	li a2, 3
+	ret
+HeroCalculator:
+	bne t2,zero,TestCalculator2
+	li a2, 3
+	ret
+TestCalculator2:	bne t2,t3,TestPencil2
+	li a2, 6
+	ret
+TestPencil2:	li a2, 12
+	ret
+HeroPencil:
+	bne t2,zero,TestCalculator3
+	li a2, 12
+	ret
+TestCalculator3:	bne t2,t3,TestPencil3
+	li a2, 3
+	ret
+TestPencil3:	li a2, 6
+	ret
+
 
 OpenBattleScreen:
-	addi sp,sp,-12
+	addi sp,sp,-16
 	sw a0,0(sp)
 	sw a1,4(sp)
-	sw ra,8(sp)
+	sw a2,8(sp)
+	sw ra,12(sp)
 
 	li t1,0xFF000000
 	li t2,0xFF00B2C0
@@ -939,7 +1053,7 @@ Life2:	lw a1,4(sp)
 	li a2,60
 	lw a3,frame_zero
 LoopLife2:	
-	beq t3,zero,Fora
+	beq t3,zero,Weapon1
 	la a0,life_bar
 	addi sp,sp, -1
 	sb t3,0(sp)
@@ -950,9 +1064,42 @@ LoopLife2:
 	addi a1,a1,8
 	j LoopLife2
 	
-Fora:	li a0, 3000
-	li a7,32
-	ecall
+Weapon1:	lw a0,0(sp)
+	lb t0,3(a0)
+	li t1,1
+	bne t0,zero,TryCalculator
+	la a0,computer
+	j DrawWeapon1
+TryCalculator:	bne t0,t1,TryPencil
+	la a0,calculator
+	j DrawWeapon1
+TryPencil:	la a0,pencil
+
+DrawWeapon1:
+	li a1,292
+	li a2,60
+	lw a3,frame_zero
+	jal drawImage
+	
+	lw a1,4(sp)
+	lb t0,3(a1)
+	li t1,1
+	bne t0,zero,TryCalculator2
+	la a0,computer
+	j DrawWeapon2
+TryCalculator2:	bne t0,t1,TryPencil2
+	la a0,calculator
+	j DrawWeapon2
+TryPencil2:	la a0,pencil
+
+DrawWeapon2:
+	li a1,12
+	li a2,60
+	lw a3,frame_zero
+	jal drawImage
+	
+	li a0, 2000
+	jal Sleep
 	
 	li t1,0xFF00B2C0
 	li t2,0xFF012C00
@@ -1011,8 +1158,11 @@ LoopLife3:
 	
 Life4:	lw a1,4(sp)
 	lb t1,2(a1)
-	addi t1,t1,-1
-	sb t1,2(a1)
+	lw a2,8(sp)
+	sub t1,t1,a2
+	bge t1,zero,Continue
+	li t1,0
+Continue:	sb t1,2(a1)
 	li t2, 10
 	sub t1, t2, t1
 	li t2,2
@@ -1023,7 +1173,7 @@ Life4:	lw a1,4(sp)
 	li a2,60
 	lw a3,frame_zero
 LoopLife4:	
-	beq t3,zero,Fora3
+	beq t3,zero,Weapon2
 	la a0,life_bar
 	addi sp,sp, -1
 	sb t3,0(sp)
@@ -1034,9 +1184,42 @@ LoopLife4:
 	addi a1,a1,8
 	j LoopLife4
 
-Fora3:	li a0, 200
-	li a7,32
-	ecall
+Weapon2:	lw a0,0(sp)
+	lb t0,3(a0)
+	li t1,1
+	bne t0,zero,TryCalculator3
+	la a0,computer
+	j DrawWeapon3
+TryCalculator3:	bne t0,t1,TryPencil3
+	la a0,calculator
+	j DrawWeapon3
+TryPencil3:	la a0,pencil
+
+DrawWeapon3:
+	li a1,292
+	li a2,60
+	lw a3,frame_zero
+	jal drawImage
+	
+	lw a1,4(sp)
+	lb t0,3(a1)
+	li t1,1
+	bne t0,zero,TryCalculator4
+	la a0,computer
+	j DrawWeapon4
+TryCalculator4:	bne t0,t1,TryPencil4
+	la a0,calculator
+	j DrawWeapon4
+TryPencil4:	la a0,pencil
+
+DrawWeapon4:
+	li a1,12
+	li a2,60
+	lw a3,frame_zero
+	jal drawImage
+
+	li a0, 200
+	jal Sleep
 	
 	li t1,0xFF00B2C0
 	li t2,0xFF012C00
@@ -1060,12 +1243,12 @@ DrawCharacters4:
 	jal drawImage
 
 Fora4:	li a0, 2000
-	li a7,32
-	ecall
+	jal Sleep
 
-	lw ra,8(sp)
-	addi sp,sp,12
+	lw ra,12(sp)
+	addi sp,sp,16
 	ret
+	
 	
 OpenLeftWeaponChoice:
 	li a0,0	# marca que deves-se usar o lado direito
@@ -1163,6 +1346,9 @@ AuxiliarBattleScreen:
 	li t0,-1
 	beq a1,t0,FinishRightMenu
 	
+	
+	jal ChooseWeapon
+		
 	jal OpenBattleScreen
 	
 	mv a0,s11
@@ -1394,7 +1580,7 @@ weaponChoiceLoopDown:
 
 weaponChosen:
 	jal getCharacterByCoordinate #pega o persoangem
-	sw s0,3(a0)	#salva arma do personagem
+	sb s0,3(a0)	#salva arma do personagem
 	
 	lb a0,menu_blue
 	addi a1,a1,-2
@@ -1564,6 +1750,8 @@ getHighlightedTile:	#recebe em (a0,a1)=(x,y) a posicao do quadrado, retorna o en
 	li t0,4
 	beq a0,t0,getHighlightedHalfHeart
 	
+	li t0,5
+	beq a0,t0,getHighlightedWall
 	li a0,-1
 	ret
 	
@@ -1583,6 +1771,9 @@ endGetHighlightedTile:
 	lw ra,0(sp)
 	addi sp,sp,4
 	ret
+getHighlightedWall:
+	la a0,HighlightedWall
+	j endGetHighlightedTile
 
 
 	
@@ -1765,7 +1956,7 @@ runHistory:	#recebe em a0 o nivel, roda procedimento da historia
 	li a1,0
 	li a2,0
 	li a3,320
-	li a4,10
+	li a4,240
 	lw a5,frame_zero
 	jal drawSquare
 	
@@ -1805,6 +1996,26 @@ runHistory:	#recebe em a0 o nivel, roda procedimento da historia
 	
 	jal readKeyBlocking
 	
+	li t0,5
+	bne t0,s1, next
+	la a0,lamarBombado
+	li a1,142
+	li a2,40
+	lw a3,frame_zero
+	jal drawImage
+	
+next:
+	li t0,6
+	bne t0,s1, LoopInf
+	la a0,lamarBombado
+	li a1,142
+	li a2,40
+	lw a3,frame_zero
+	jal drawImage
+	
+	li t0,6
+LoopInf:
+	beq s1,t0,LoopInf
 	lw ra,0(sp)
 	addi sp,sp,4
 	ret
@@ -1822,7 +2033,7 @@ getLevelName:	#recebe em a0 o nivel, pega a primeira mensagem
 	beq a0,t0,getName.level4
 	li t0,5
 	beq a0,t0,getName.level5
-	li t0,5
+	li t0,6
 	beq a0,t0,getName.level6
 getName.level0:
 	la a0, fase_0_nome
@@ -1860,7 +2071,7 @@ getSecondMessage:	#recebe em a0 o nivel, pega a primeira mensagem
 	beq a0,t0,secondMessage.level4
 	li t0,5
 	beq a0,t0,secondMessage.level5
-	li t0,5
+	li t0,6
 	beq a0,t0,secondMessage.level6
 secondMessage.level0:
 	la a0, fase_0_hist2
@@ -1898,7 +2109,7 @@ getFirstMessage:	#recebe em a0 o nivel, pega a primeira mensagem
 	beq a0,t0,firstMessage.level4
 	li t0,5
 	beq a0,t0,firstMessage.level5
-	li t0,5
+	li t0,6
 	beq a0,t0,firstMessage.level6
 firstMessage.level0:
 	la a0, fase_0_hist1
@@ -2250,6 +2461,8 @@ getTile: #recebe em a0 o código do tile, retorna em a0 o endereço do tile ou -
 	beq a0,t0,FullHeartTile
 	addi t0,t0,1
 	beq a0,t0,HalfHeartTile
+	addi t0,t0,1
+	beq a0,t0,WallTile
 	li a0,-1
 	ret
 grassTile:
@@ -2264,7 +2477,9 @@ FullHeartTile:
 HalfHeartTile:
 	la a0,HalfHeart
 	ret
-
+WallTile:
+	la a0,Wall
+	ret
 
 
 readKeyBlocking:
