@@ -4,7 +4,9 @@
 This game was inspired by the 2003 Game Boy RPG <em> Fire Emblem - The Blazing Blade </em> and adapted to a context in
 which the player has to get through Computer Science subjects, util reaching the final boss, 
 our Computer Architecture professor (Mr. Lamar is totally fine about that). 
-
+<p align="center">
+  <img src="https://github.com/henriqueramosqs/Fire-Emblem/blob/main/FireEmblem.png?raw=true" width="400"/>
+</p>
 
 
 ## Intalation and Running
